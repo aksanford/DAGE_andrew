@@ -57,7 +57,7 @@ The last bullet in each section asks which portion of the data science process y
 
 ---
 
-## Student 1: [Full Name] (`github-username`)
+## Student 1: [Grant Mooslin] (`grantmooslin`)
 
 - **The component I "owned" and that I summarize here is best described as** *[One or two sentences. Name the thing. "The ingestion layer," "the model comparison and cross-validation," "the figure pipeline." Not "I helped with the analysis."]*
 - **You can find this contribution in a file called** `filename.qmd` **at lines** XX–YY. *[Add a permalink. List more than one file if the component genuinely spans them.]*
@@ -67,7 +67,7 @@ The last bullet in each section asks which portion of the data science process y
 
 ---
 
-## Student 2: [Full Name] (`github-username`)
+## Student 2: [Emily Huffaker] (`emilyhuffaker)
 
 - **The component I "owned" and that I summarize here is best described as**
 - **You can find this contribution in a file called** `filename.qmd` **at lines** XX–YY.
@@ -77,7 +77,7 @@ The last bullet in each section asks which portion of the data science process y
 
 ---
 
-## Student 3: [Full Name] (`github-username`)
+## Student 3: [Andrew Sanford] (`aksanford`)
 
 - **The component I "owned" and that I summarize here is best described as**
 - **You can find this contribution in a file called** `filename.qmd` **at lines** XX–YY.
@@ -87,7 +87,7 @@ The last bullet in each section asks which portion of the data science process y
 
 ---
 
-## Student 4: [Full Name] (`github-username`)
+## Student 4: [Dasey Dang] (`daseydang`)
 
 - **The component I "owned" and that I summarize here is best described as**
 - **You can find this contribution in a file called** `filename.qmd` **at lines** XX–YY.
