@@ -3,7 +3,7 @@
 **Group:** DAGE
 **Course:** PSYCH 755, Summer 2026
 
- >>>>> One or two sentences on what this project asks and what it found. Replace this before you submit. <<<<<
+ >>>>> To what extent can semantic features extracted from participants’ open-ended advice about social nervousness predict their own communication apprehension/use of public transportation vs other rideshare options? <<<<<
 
 ## Members
 
@@ -14,9 +14,7 @@
 | Andrew Sanford | aksanford |
 | Dasey Dang | daseydang |
 
-If your GitHub handle is not your name, this table is how we connect your commits to you. Fill it in during the first 72 hours (each member can fill in their own name to satisfy the initial commitment requirement).
-
-## Suggested Project Structure + Contents
+## Project Structure + Contents
 
 | Path | What it is |
 |---|---|
