@@ -55,7 +55,22 @@ survey_ap |>
     values_to = "score"
   ) |>
   ggplot(aes(x = score, fill = type)) +
-  geom_density(alpha = 0.5)
+  geom_density(alpha = 0.5) +
+  scale_fill_discrete(
+    labels = c(
+      "group_apprehension" = "Group Discussion",
+      "solo_apprehension"  = "Solo Conversation"
+    )
+  ) +
+  labs(
+    title = 'Distributions of Group Discussion vs.\nSolo Conversation Apprehension Scores',
+    fill = NULL
+  ) +
+  theme(
+    legend.position = "inside",
+    legend.position.inside = c(1, 1),
+    legend.justification = c(1, 1)
+  )
 ```
 
 ```{r}
@@ -63,18 +78,41 @@ r2 <- summary(lm(group_apprehension ~ solo_apprehension, data = survey_ap))$r.sq
 
 ggplot(survey_ap, aes(x = solo_apprehension, y = group_apprehension)) +
   geom_point() +
-  geom_smooth(method = "lm") +
-  annotate("text", x = Inf, y = Inf, hjust = 1.1, vjust = 1.5,
-           label = paste0("R\u00b2 = ", round(r2, 2)))
+  geom_smooth(method = "lm", se = FALSE) +
+  annotate("text", x = Inf, y = Inf, hjust = 7.1, vjust = 1.5,
+           label = paste0("R\u00b2 = ", round(r2, 2))) +
+  labs(
+    x = "Solo Apprehension",
+    y = "Group Apprehension"
+  )
 ```
 
 ```{R}
+#| label: dominant_apprehension_bar
+#| fig-width: 6
+#| fig-height: 4
+#| out-width: 25%
 survey_ap |>
   mutate(biggest_fear = biggest_fear |>
            replace_na("NA") |>
            factor(levels = c("solo_apprehension", "NA", "group_apprehension"))) |>
-  ggplot(aes(x = biggest_fear)) +
-  geom_bar()
+  ggplot(aes(x = biggest_fear, fill = biggest_fear)) +
+  geom_bar() +
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.3) +
+  scale_x_discrete(
+    labels = c(
+      "solo_apprehension"  = "Solo Conversation",
+      "group_apprehension" = "Group Discussion",
+      "NA"                 = "Equal"
+    )
+  ) +
+  scale_fill_discrete(guide = "none") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  labs(
+    title = 'Dominant Apprehension Type is Roughly Equal',
+    x = "Biggest Fear",
+    y = "Count"
+  )
 ```
 
 ## EDA of transportation scores
@@ -107,4 +145,33 @@ survey_ts |>
            factor(levels = c("rideshare", "NA", "public_transit"))) |>
   ggplot(aes(x = highest_transport)) +
   geom_bar()
+```
+
+
+```{r}
+#| label: dominant_transportation_bar
+#| fig-width: 6
+#| fig-height: 4
+#| out-width: 25%
+survey_ts |>
+  mutate(highest_transport = highest_transport |>
+           replace_na("NA") |>
+           factor(levels = c("rideshare", "NA", "public_transit"))) |>
+  ggplot(aes(x = highest_transport, fill = highest_transport)) +
+  geom_bar() +
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.3) +
+  scale_x_discrete(
+    labels = c(
+      "rideshare"  = "Rideshare\nServices",
+      "public_transit" = "Public\nTransit",
+      "NA"                 = "Equal"
+    )
+  ) +
+  scale_fill_discrete(guide = "none") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  labs(
+    title = 'Dominant Transportation Method is Imbalanced',
+    x = "Dominant Transportation Method",
+    y = "Count"
+  )
 ```
