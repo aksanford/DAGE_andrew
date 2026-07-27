@@ -8,3 +8,5 @@ data_clean/*
 /.quarto/
 **/*.quarto_ipynb
 _quarto.yml
+.venv
+__pycache__/
