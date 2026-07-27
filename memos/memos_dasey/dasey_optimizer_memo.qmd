@@ -1,0 +1,58 @@
+---
+title: "Dasey's Research Memo"
+format:
+  html:
+    toc: false
+    embed-resources: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+**Researcher:** Dasey Dang  
+**Date:** July 29, 2026  
+
+**Research Or Analytical Question:**  
+Which optimizer produces the strongest validation performance for a three-class neural network predicting transportation-use dominance from participants' open-ended descriptions of their ideal transportation?
+
+## Answer, Response, + Summary of Results
+
+Adam is the most effective of the three optimizers tested for this neural-network architecture and data split.
+
+Using the transportation modeling data, I compared Adam, RMSprop, and stochastic gradient descent (SGD) while holding the neural-network architecture constant. The outcome included three classes: public transit dominant, rideshare dominant, and no dominant mode. The data were divided using a stratified 70/15/15 train, validation, and test split with a fixed seed of 1738.
+
+Because the outcome classes were imbalanced, macro-F1 was used as the primary validation metric. Adam produced the strongest validation performance with a macro-F1 of **0.4270** and validation accuracy of **0.6250**. RMSprop and SGD each produced a macro-F1 of **0.2342** and validation accuracy of **0.5417**.
+
+```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+
+results = pd.DataFrame({
+    "Optimizer": ["Adam", "RMSprop", "SGD"],
+    "Validation Macro-F1": [0.427035, 0.234234, 0.234234]
+})
+
+plot_df = results.sort_values("Validation Macro-F1")
+
+plt.figure(figsize=(7, 4))
+
+plt.barh(
+    plot_df["Optimizer"],
+    plot_df["Validation Macro-F1"]
+)
+
+plt.xlabel("Validation Macro-F1")
+plt.ylabel("Optimizer")
+plt.title("Validation Performance by Optimizer")
+
+for i, value in enumerate(plot_df["Validation Macro-F1"]):
+    plt.text(
+        value + 0.005,
+        i,
+        f"{value:.3f}",
+        va="center"
+    )
+
+plt.tight_layout()
+plt.show()
