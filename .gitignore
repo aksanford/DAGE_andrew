@@ -4,3 +4,7 @@
 .Ruserdata
 data_org/*
 data_clean/*
+
+/.quarto/
+**/*.quarto_ipynb
+_quarto.yml

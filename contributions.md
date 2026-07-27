@@ -1,8 +1,8 @@
 # Contributions
 
-**Group [DAGE]:** [Makeup A Fun Professional Group Name]
-**Group Members:** [Grant, Emily, Andrew, Dasey]
-**Project:** [DAGE Saves the Day]
+**Group:** [DAGE (Data Analysis is Great and Excellent)]
+**Group Members:** [Dasey Dang, Andrew Sanford, Grant Mooslin, Emily Huffaker]
+**Project:** [DAGE Saves the Day - Predicting Survey Results from Open-Text Responses]
 **Repository:** [https://github.com/grantmooslin/DAGE]
 
 ---
@@ -15,7 +15,7 @@ if your group has fewer than five members.
 
 Three rules:
 
-1. **Components are not co-owned.** No two students may not claim the same component. If you and a partner pair-programmed something, decide who owned it and ackowledge the two person effort. Each person needs their own entry below.
+1. **Components are not co-owned.** No two students may not claim the same component. If you and a partner pair-programmed something, decide who owned it and acknowledge the two person effort. Each person needs their own entry below.
 2. **Everything here must be checkable.** We will follow your file paths and click your links. A claim we cannot verify does not count.
 3. **Link to permanent URLs, not moving ones.** See the note on line numbers below.
 
@@ -41,7 +41,7 @@ https://github.com/ORG/REPO/blob/main/analysis/model.qmd#L112-L168
 
 ### The data science process
 
-The last bullet in each section asks which portion of the data science process your work contributes to. Name the stage and be specific about your part in it ("data acquisitionand ingestion," "cleaning and validation," "exploratory analysis," "modeling," "evaluation," "visualization and communication," "infrastructure and reproducibility.") If your component spans two stages, say so, and say which one it mostly lives in.
+The last bullet in each section asks which portion of the data science process your work contributes to. Name the stage and be specific about your part in it ("data acquisition and ingestion," "cleaning and validation," "exploratory analysis," "modeling," "evaluation," "visualization and communication," "infrastructure and reproducibility.") If your component spans two stages, say so, and say which one it mostly lives in.
 
 ---
 
@@ -67,7 +67,7 @@ The last bullet in each section asks which portion of the data science process y
 
 ---
 
-## Student 2: [Emily Huffaker] (`emilyhuffaker)
+## Student 2: [Emily Huffaker] (`emilyhuffaker')
 
 - **The component I "owned" and that I summarize here is best described as**
 - **You can find this contribution in a file called** `filename.qmd` **at lines** XX–YY.
@@ -79,11 +79,11 @@ The last bullet in each section asks which portion of the data science process y
 
 ## Student 3: [Andrew Sanford] (`aksanford`)
 
-- **The component I "owned" and that I summarize here is best described as**
-- **You can find this contribution in a file called** `filename.qmd` **at lines** XX–YY.
-- **Owning this component means**
-- **The commits or PRs that are most relevant are**
-- **The portion of the data science process that this effort contributes to is**
+- **The component I "owned" and that I summarize here is best described as** the cleaning script/notebook that prepares raw data for modelling. This included joining the 3 separate raw data files, basic cleaning and engineering our categorical outcome variables based upon a comparison of composite scores from the PRCA and transportation questions.
+- **You can find this contribution in a file called** `clean_data.qmd` within the DAGE/scripts/ directory. [Permalink to 'clean_data.qmd'] (https://github.com/grantmooslin/DAGE/blob/main/scripts/clean_data.qmd)
+- **Owning this component means** that I authored the entirety of this component individually.
+- **The commits or PRs that are most relevant are** [#11 - Add cleaning and EDA scripts](https://github.com/grantmooslin/DAGE/pull/11) where the component was added to the repo.
+- **The portions of the data science process that this effort contributes to are** stage 1, **data acquisition and ingestion** and stage 2, **cleaning and validation** - This script is an essential first step for all team members to execute and generate usable data files for modelling. 
 
 ---
 

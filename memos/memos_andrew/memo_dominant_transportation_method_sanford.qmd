@@ -1,0 +1,40 @@
+---
+title: "Research Memo - Dominant Transportation Methods"
+author: Andrew K. Sanford
+pdf-engine: xelatex
+date: 7/29/2026
+cache: false
+format:
+  pdf:
+    keep-tex: false
+    documentclass: article
+    papersize: letter
+    mainfont: Arial
+    fontsize: 11pt
+
+    nclude-in-header:
+      text: |
+        \setkomafont{title}{\medium}
+        \pagenumbering{gobble}
+    geometry:
+      - top=0.5in
+      - left=1in
+      - right=1in
+      - bottom=1in
+---
+
+\thispagestyle{empty}
+
+**To:** DAGE & Dr. Adam Ross Nelson
+
+**Re:** \[Are there differences in dominant transportation method?\]
+
+To determine if our data supports pursuing the open-text classification research question, EDA examined the distribution of respondents’ dominant transportation method.
+
+{{< embed ../../scripts/eda_dependents.qmd#dominant_transportation_bar >}}
+
+When comparing respondents with a dominating transportation method, public transit is far more prevalent than rideshare services. This large imbalance is problematic for classification and suggest that model training will require substantial resampling.
+
+We also have \~32% of respondents who indicated equal usage across both transportation methods. Pursuing binary classification would entail excluding a significant portion of our sample as a result. While there are still large imbalances between all 3 classes, [my recommendation is to pursue a **3-way classification** for this problem]{.underline} to avoid reducing our usable training sample.
+
+Next steps include exploration of viable resampling techniques that will assist our models in training and performing well, keeping in mind the complicate nature of our open-text inputs.
