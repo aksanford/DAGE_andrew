@@ -1,0 +1,40 @@
+---
+title: "Research Memo - Dominant Apprehension Types"
+author: Andrew K. Sanford
+pdf-engine: xelatex
+date: 7/29/2026
+cache: false
+format:
+  pdf:
+    keep-tex: true
+    documentclass: article
+    papersize: letter
+    mainfont: Arial
+    fontsize: 11pt
+
+    nclude-in-header:
+      text: |
+        \setkomafont{title}{\medium}
+        \pagenumbering{gobble}
+    geometry:
+      - top=0.5in
+      - left=1in
+      - right=1in
+      - bottom=1in
+---
+
+\thispagestyle{empty}
+
+**To:** DAGE & Dr. Adam Ross Nelson
+
+**Re:** \[Are there differences in dominant apprehension type?\]
+
+To determine if our data supports pursuing the open-text classification research question, EDA examined the distribution of respondents' "biggest fear".
+
+{{< embed ../../scripts/eda_dependents.qmd#dominant_apprehension_bar >}}
+
+When comparing dominating apprehension types, solo conversation was only slightly more abundant. This mild imbalance is still very suitable for binary classification.
+
+Only \~10% of respondents were equal on both types, however. This would be a very imbalanced and difficult to use sample for 3-way classification. [My recommendation is to pursue **binary classification** for this problem.]{.underline}
+
+Note that this decision requires excluding the 16 ‘Equal’ observations from training and validation sets, as well as rendering them unusable for generating most performance metrics in the test set. Confidence values for predictions on ‘Equal’ observations could still be useful for evaluating model calibration, with a well-calibrated model being expected to make low-confidence predictions for such observations.

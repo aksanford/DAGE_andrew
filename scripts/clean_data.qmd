@@ -193,12 +193,12 @@ solo_conversation <- c(
 survey <- survey |> 
   mutate(
     
-#   Sum of group apprehension Q's
-    group_apprehension = rowSums(
+#   Average of group apprehension Q's
+    group_apprehension = rowMeans(
       pick(all_of(group_discussion)), na.rm = TRUE),
     
-#   Sum of solo apprehension Q's
-    solo_apprehension = rowSums(
+#   Average of solo apprehension Q's
+    solo_apprehension = rowMeans(
       pick(all_of(solo_conversation)), na.rm = TRUE),
 
 #   Assign greatest of the two values (equal becomes NA)
