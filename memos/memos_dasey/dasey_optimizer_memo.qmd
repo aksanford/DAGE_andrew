@@ -1,5 +1,6 @@
 ---
 title: "Dasey's Research Memo"
+jupyter: python3
 format:
   html:
     toc: false
@@ -10,10 +11,10 @@ execute:
   message: false
 ---
 
-**Researcher:** Dasey Dang  
-**Date:** July 29, 2026  
+**Researcher:** Dasey Dang
+**Date:** July 29, 2026
 
-**Research Or Analytical Question:**  
+**Research Or Analytical Question:**
 Which optimizer produces the strongest validation performance for a three-class neural network predicting transportation-use dominance from participants' open-ended descriptions of their ideal transportation?
 
 ## Answer, Response, + Summary of Results
@@ -24,35 +25,14 @@ Using the transportation modeling data, I compared Adam, RMSprop, and stochastic
 
 Because the outcome classes were imbalanced, macro-F1 was used as the primary validation metric. Adam produced the strongest validation performance with a macro-F1 of **0.4270** and validation accuracy of **0.6250**. RMSprop and SGD each produced a macro-F1 of **0.2342** and validation accuracy of **0.5417**.
 
-```{python}
-import pandas as pd
-import matplotlib.pyplot as plt
+![](optimizer_comparison.png){fig-alt="Bar chart comparing validation macro-F1 across Adam, RMSprop, and SGD." width=70%}
 
-results = pd.DataFrame({
-    "Optimizer": ["Adam", "RMSprop", "SGD"],
-    "Validation Macro-F1": [0.427035, 0.234234, 0.234234]
-})
+## What questions or uncertainties remain? (Need not be exhaustive)
 
-plot_df = results.sort_values("Validation Macro-F1")
+Would class weighting improve the model's ability to classify rideshare-dominant cases?
 
-plt.figure(figsize=(7, 4))
+Would Adam remain the strongest optimizer if learning rates were separately tuned for Adam, RMSprop, and SGD?
 
-plt.barh(
-    plot_df["Optimizer"],
-    plot_df["Validation Macro-F1"]
-)
+How stable are these optimizer results across different reproducible train, validation, and test splits?
 
-plt.xlabel("Validation Macro-F1")
-plt.ylabel("Optimizer")
-plt.title("Validation Performance by Optimizer")
-
-for i, value in enumerate(plot_df["Validation Macro-F1"]):
-    plt.text(
-        value + 0.005,
-        i,
-        f"{value:.3f}",
-        va="center"
-    )
-
-plt.tight_layout()
-plt.show()
+Would the relative performance of the optimizers change with a larger sample, particularly with more rideshare-dominant observations?
