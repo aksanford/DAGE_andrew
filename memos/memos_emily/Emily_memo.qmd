@@ -1,0 +1,43 @@
+---
+title: "Research Memo: Neural Network Activation Functions"
+jupyter: python3
+format:
+  html:
+    toc: false
+    embed-resources: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+**Researcher:** Emily Huffaker\
+**Date:** July 27, 2026
+
+**Research Or Analytical Question:**\
+Which activation functions are used in the three-class neural network predicting transportation-use dominance, and why are they appropriate for this model?
+
+## Answer, Response, + Summary of Results
+
+The neural network uses ReLU in its hidden Dense layer and softmax in its output layer. Each activation function serves a different purpose within the model.
+
+| Model layer | Units | Activation function | Purpose |
+|----|---:|----|----|
+| Hidden Dense layer | 64 | ReLU | Allows the model to learn nonlinear patterns in participants' text responses |
+| Output Dense layer | 3 | Softmax | Produces probabilities across the three outcome classes |
+
+ReLU converts negative values to zero while retaining positive values. This introduces nonlinearity into the hidden layer, allowing the model to learn more complex relationships between participants' open-ended responses and their transportation-use classifications.
+
+The output layer uses softmax because the model predicts three mutually exclusive classes: public transit dominant, rideshare dominant, and no dominant transportation mode. Softmax converts the model's outputs into probabilities that sum to one, and the class with the highest probability becomes the prediction.
+
+Using ReLU and softmax with the Adam optimizer, the model produced a validation macro-F1 score of **0.4270** and validation accuracy of **0.6250**. On the test data, the model produced a macro-F1 score of **0.404** and accuracy of **0.583**.
+
+These results describe the performance of the complete model. Because alternative activation functions were not tested, the results do not establish that ReLU is the strongest possible choice.
+
+## What questions or uncertainties remain?
+
+Would tanh, Leaky ReLU, or GELU produce stronger validation performance than ReLU while holding the model architecture and optimizer constant?
+
+Would class weighting improve performance for the underrepresented rideshare-dominant class?
+
+Would the results remain stable across different training, validation, and test splits?
