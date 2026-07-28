@@ -10,3 +10,4 @@ data_clean/*
 _quarto.yml
 .venv
 __pycache__/
+.DS_Store
