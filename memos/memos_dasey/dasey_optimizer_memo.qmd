@@ -1,38 +1,53 @@
 ---
-title: "Dasey's Research Memo"
-jupyter: python3
+title: "Research Memo - Best Optimizer Selection"
+author: Dasey Dang
+pdf-engine: xelatex
+date: 7/30/2026
+cache: false
 format:
-  html:
-    toc: false
-    embed-resources: true
-execute:
-  echo: false
-  warning: false
-  message: false
+  pdf:
+    keep-tex: true
+    documentclass: article
+    papersize: letter
+    mainfont: Times New Roman
+    fontsize: 11pt
+
+    nclude-in-header:
+      text: |
+        \setkomafont{title}{\medium}
+        \pagenumbering{gobble}
+    geometry:
+      - top=0.5in
+      - left=1in
+      - right=1in
+      - bottom=1in
 ---
 
-**Researcher:** Dasey Dang
-**Date:** July 29, 2026
+\thispagestyle{empty}
 
-**Research Or Analytical Question:**
-Which optimizer produces the strongest validation performance for a three-class neural network predicting transportation-use dominance from participants' open-ended descriptions of their ideal transportation?
+**To: DAGE & Adam Ross Nelson**
+
+**Research Question:** \[When using open ended descriptions to predict dominant transportation mode, which optimizer produces the best F1 score?\]
 
 ## Answer, Response, + Summary of Results
+Adam is the most effective of the three optimizers tested for this neural-network architecture and data split. Using the transportation modeling data,
+I compared Adam, RMSprop, and stochastic gradient descent (SGD) while holding the neural-network architecture constant. The outcome included three classes:
+public transit dominant, rideshare dominant, and no dominant mode. The data were divided using a stratified 70/15/15 train, validation, and test split with
+a fixed seed of 1738. Because the outcome classes were imbalanced, macro-F1 was used as the primary validation metric. Adam produced the strongest validation
+performance with a macro-F1 of **0.4270** and validation accuracy of **0.6250**. RMSprop and SGD each produced a macro-F1 of **0.2342** and validation accuracy
+of **0.5417**.
 
-Adam is the most effective of the three optimizers tested for this neural-network architecture and data split.
 
-Using the transportation modeling data, I compared Adam, RMSprop, and stochastic gradient descent (SGD) while holding the neural-network architecture constant. The outcome included three classes: public transit dominant, rideshare dominant, and no dominant mode. The data were divided using a stratified 70/15/15 train, validation, and test split with a fixed seed of 1738.
+| Optimizer | Validation Macro-F1 | Validation Accuracy |
+|:----------|--------------------:|--------------------:|
+| Adam      | **0.4270**          | **0.6250**          |
+| RMSprop   | 0.2342              | 0.5417              |
+| SGD       | 0.2342              | 0.5417              |
 
-Because the outcome classes were imbalanced, macro-F1 was used as the primary validation metric. Adam produced the strongest validation performance with a macro-F1 of **0.4270** and validation accuracy of **0.6250**. RMSprop and SGD each produced a macro-F1 of **0.2342** and validation accuracy of **0.5417**.
 
-![](optimizer_comparison.png){fig-alt="Bar chart comparing validation macro-F1 across Adam, RMSprop, and SGD." width=70%}
+## What questions or uncertainties remain?
 
-## What questions or uncertainties remain? (Need not be exhaustive)
+The optimizer comparison was based on one data split and one set of learning-rate settings. Additional testing is needed to determine whether Adam remains the
+strongest optimizer across different splits, tuned learning rates, and class-weighting approaches. Would Adam remain the strongest optimizer if learning rates
+were separately tuned for Adam, RMSprop, and SGD?
 
-Would class weighting improve the model's ability to classify rideshare-dominant cases?
-
-Would Adam remain the strongest optimizer if learning rates were separately tuned for Adam, RMSprop, and SGD?
-
-How stable are these optimizer results across different reproducible train, validation, and test splits?
-
-Would the relative performance of the optimizers change with a larger sample, particularly with more rideshare-dominant observations?
