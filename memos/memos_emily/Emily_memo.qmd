@@ -1,43 +1,54 @@
 ---
 title: "Research Memo: Neural Network Activation Functions"
-jupyter: python3
+author: "Emily Huffaker"
+pdf-engine: xelatex
+date: 7/29/2026
+cache: false
 format:
-  html:
-    toc: false
-    embed-resources: true
-execute:
-  echo: false
-  warning: false
-  message: false
+  pdf:
+    keep-tex: true
+    documentclass: article
+    papersize: letter
+    mainfont: Times New Roman
+    fontsize: 11pt
+
+    nclude-in-header:
+      text: |
+        \setkomafont{title}{\medium}
+        \pagenumbering{gobble}
+    geometry:
+      - top=0.5in
+      - left=1in
+      - right=1in
+      - bottom=1in
 ---
 
-**Researcher:** Emily Huffaker\
-**Date:** July 27, 2026
+**Researcher:** Emily Huffaker  
+**Date:** July 29, 2026
 
-**Research Or Analytical Question:**\
-Which activation functions are used in the three-class neural network predicting transportation-use dominance, and why are they appropriate for this model?
+**Research Question:** When using open-ended descriptions to predict dominant transportation mode, which activation function achieves the best F1 score?
 
 ## Answer, Response, + Summary of Results
 
-The neural network uses ReLU in its hidden Dense layer and softmax in its output layer. Each activation function serves a different purpose within the model.
+To answer this research question, I tested four different activation functions in the neural network's hidden layer while holding the architecture, optimizer (Adam), and training parameters constant. The activation functions tested were ReLU, tanh, Leaky ReLU, and GELU.
 
-| Model layer | Units | Activation function | Purpose |
-|----|---:|----|----|
-| Hidden Dense layer | 64 | ReLU | Allows the model to learn nonlinear patterns in participants' text responses |
-| Output Dense layer | 3 | Softmax | Produces probabilities across the three outcome classes |
+![Activation function comparison](activation_comparison.png)
 
-ReLU converts negative values to zero while retaining positive values. This introduces nonlinearity into the hidden layer, allowing the model to learn more complex relationships between participants' open-ended responses and their transportation-use classifications.
+The results show that ReLU achieved the highest validation macro-F1 score of 0.536, followed by tanh with 0.474. The complete performance comparison is shown below:
 
-The output layer uses softmax because the model predicts three mutually exclusive classes: public transit dominant, rideshare dominant, and no dominant transportation mode. Softmax converts the model's outputs into probabilities that sum to one, and the class with the highest probability becomes the prediction.
+| Activation Function | Validation Macro-F1 | Validation Accuracy | Epochs Trained |
+|:--|--:|--:|--:|
+| ReLU | 0.536 | 0.667 | 50 |
+| tanh | 0.474 | 0.583 | 41 |
+| GELU | 0.447 | 0.542 | 47 |
+| Leaky ReLU | 0.444 | 0.542 | 45 |
 
-Using ReLU and softmax with the Adam optimizer, the model produced a validation macro-F1 score of **0.4270** and validation accuracy of **0.6250**. On the test data, the model produced a macro-F1 score of **0.404** and accuracy of **0.583**.
+These results indicate that ReLU is the most effective choice for this neural network architecture when predicting transportation mode from open-ended text responses.
 
-These results describe the performance of the complete model. Because alternative activation functions were not tested, the results do not establish that ReLU is the strongest possible choice.
+## What Questions or Uncertainties Remain?
 
-## What questions or uncertainties remain?
-
-Would tanh, Leaky ReLU, or GELU produce stronger validation performance than ReLU while holding the model architecture and optimizer constant?
-
-Would class weighting improve performance for the underrepresented rideshare-dominant class?
+Would these activation function rankings remain consistent with different architectures or hyperparameters?
 
 Would the results remain stable across different training, validation, and test splits?
+
+How would these activation functions perform on the apprehension prediction task?
