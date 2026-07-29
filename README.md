@@ -3,7 +3,10 @@
 **Group:** DAGE
 **Course:** PSYCH 755, Summer 2026
 
- >>>>> To what extent can semantic features extracted from participants’ open-ended advice about social nervousness predict their own communication apprehension/use of public transportation vs other rideshare options? <<<<<
+ >>>>> Communication apprehension:
+How accurately can semantic features from participants’ open-ended responses predict their dominant type of communication apprehension?
+Transportation use:
+How accurately can semantic features from participants’ descriptions of their ideal travel predict whether their transportation use is public-transit dominant, rideshare dominant, or has no dominant mode? <<<<<
 
 ## Members
 
