@@ -1,0 +1,98 @@
+---
+title: "Research Memo - Apprehension Type Engineering"
+author: Andrew K. Sanford
+pdf-engine: xelatex
+date: 7/30/2026
+cache: false
+format:
+  pdf:
+    keep-tex: true
+    documentclass: article
+    papersize: letter
+    mainfont: Arial
+    fontsize: 11pt
+
+    nclude-in-header:
+      text: |
+        \setkomafont{title}{\medium}
+        \pagenumbering{gobble}
+    geometry:
+      - top=0.5in
+      - left=1in
+      - right=1in
+      - bottom=0.75in
+---
+
+**Re:** \[How is Dominant Apprehension Type determined?\]
+
+Dominant Apprehension Type is an engineered outcome variable that identifies the greatest of two composite scores: Group Discussion Apprehension & Solo Conversation Apprehension.
+
+```{r}
+#| eval: FALSE
+#| echo: TRUE
+# Identify forward and reverse-coded Q's (Higher scores = more apprehensive)
+forward_code <- c(
+  "q1_dislike_groupdiscussion", "q3_nervous_groupdiscussion",
+  "q5_tense_newppl_groupdiscussion", "q13_nervous_newppl_convo",
+  "q15_nervous_convo", "q18_afraid_convo"
+  )
+reverse_code <- c(
+  "q2_comfort_groupdiscussion", "q4_like_groupdiscussion",
+  "q6_relaxed_groupdiscussion", "q14_nofear_speaking_convo",
+  "q16_relaxed_convo", "q17_relaxed_newppl_convo"
+  )
+# Set numeric values for Likert scales
+likert_forward <- c(
+  "Strongly disagree"          = 1,
+  "Somewhat disagree"          = 2,
+  "Neither agree nor disagree" = 3,
+  "Somewhat agree"             = 4,
+  "Strongly agree"             = 5
+)
+likert_reverse <- c(
+  "Strongly disagree"          = 5,
+  "Somewhat disagree"          = 4,
+  "Neither agree nor disagree" = 3,
+  "Somewhat agree"             = 2,
+  "Strongly agree"             = 1
+)
+# Convert to numeric
+survey <- survey |>
+  mutate(
+    across(all_of(forward_code), ~ likert_forward[.x]),
+    across(all_of(reverse_code), ~ likert_reverse[.x])
+  )
+# Identify group discussion vs. solo conversation Q's
+group_discussion <- c(
+  "q1_dislike_groupdiscussion", "q2_comfort_groupdiscussion",
+  "q3_nervous_groupdiscussion", "q4_like_groupdiscussion",
+  "q6_relaxed_groupdiscussion"
+  )
+solo_conversation <- c(
+  "q13_nervous_newppl_convo", "q14_nofear_speaking_convo",
+  "q15_nervous_convo",        "q16_relaxed_convo",
+  "q17_relaxed_newppl_convo", "q18_afraid_convo"
+  )
+# Calculate biggest fear
+survey <- survey |> 
+  mutate(
+    
+#   Average of group apprehension Q's
+    group_apprehension = rowMeans(
+      pick(all_of(group_discussion)), na.rm = TRUE),
+    
+#   Average of solo apprehension Q's
+    solo_apprehension = rowMeans(
+      pick(all_of(solo_conversation)), na.rm = TRUE),
+
+#   Assign greatest of the two values (equal becomes NA)
+    biggest_fear = case_when(
+      group_apprehension > solo_apprehension ~ "group_apprehension",
+      solo_apprehension > group_apprehension ~ "solo_apprehension",
+      .default = "equal")
+  )
+```
+
+After numericizing Likert scale values from a participants PRCA responses, relevant questions were sorted into these two groups, depending on which type of apprehension each question targeted. Each group then had the corresponding numeric Likert scale values averaged to calculate the composite scores for 'average group discussion apprehension' and 'average solo conversation apprehension'. Finally, the Dominant Apprehension Type takes the largest of these two values and codes for the corresponding group, or indicates if both scores are equal.
+
+*NOTE: This code for engineering 'Dominant Transportation Method' occurs in the clean_data.qmd script.*
