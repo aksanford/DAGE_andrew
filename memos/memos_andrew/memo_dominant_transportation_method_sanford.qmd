@@ -1,5 +1,5 @@
 ---
-title: "Research Memo - Dominant Transportation Methods"
+title: "Research Memo - Dominant Transportation Imbalance"
 author: Andrew K. Sanford
 pdf-engine: xelatex
 date: 7/29/2026
@@ -20,21 +20,21 @@ format:
       - top=0.5in
       - left=1in
       - right=1in
-      - bottom=1in
+      - bottom=0.75in
 ---
 
 \thispagestyle{empty}
 
-**To:** DAGE & Dr. Adam Ross Nelson
+**Re:** \[Is the distribution of Dominant Transportation Methods balanced?\]
 
-**Re:** \[Are there differences in dominant transportation method?\]
+The distribution of Dominant Transportation Methods is grossly imbalanced when considering all possible categories (rideshare, public transit, neither, equal), however the distribution becomes roughly balanced when collapsing categories down to public transit vs. all other possibilities combined.
 
-To determine if our data supports pursuing the open-text classification research question, EDA examined the distribution of respondents’ dominant transportation method.
+{{< embed ../../scripts/eda_dependents.qmd#transportation_grid >}}
 
-{{< embed ../../scripts/eda_dependents.qmd#dominant_transportation_bar >}}
+These figures illustrate the dominance of public transit use is far more prevalent than all other categories, even when combined. The right-hand plot is a direct comparison of public transit dominance versus the combined count of rideshare, neither, and equal use respondents.
 
-When comparing respondents with a dominating transportation method, public transit is far more prevalent than rideshare services. This large imbalance is problematic for classification and suggest that model training will require substantial resampling.
+Attempting to build a 4-way classifier with the current dataset will prove difficult due to the limited sample size for our minority categories, and the challenges of resampling procedures with the inherently complicated natural language data we are using as inputs. When categories are collapsed as seen in the right-hand plot, however, our data immediately becomes much more balanced and thereby preferable for training a classifier. For these reasons, my recommendation [is to pursue a **binary classification** of whether of not a respondent primarily uses public transit.]{.underline}
 
-We also have \~32% of respondents who indicated equal usage across both transportation methods. Pursuing binary classification would entail excluding a significant portion of our sample as a result. While there are still large imbalances between all 3 classes, [my recommendation is to pursue a **3-way classification** for this problem]{.underline} to avoid reducing our usable training sample.
+*NOTE: The engineering of 'Dominant Transportation Method' occurs in the clean_data.qmd script.*
 
-Next steps include exploration of viable resampling techniques that will assist our models in training and performing well, keeping in mind the complicate nature of our open-text inputs.
+*NOTE: Rendering of the above figures occurs in the eda_dependents.qmd script.*

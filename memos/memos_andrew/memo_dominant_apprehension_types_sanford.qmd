@@ -1,5 +1,5 @@
 ---
-title: "Research Memo - Dominant Apprehension Types"
+title: "Research Memo - Dominant Apprehension Imbalance"
 author: Andrew K. Sanford
 pdf-engine: xelatex
 date: 7/29/2026
@@ -20,21 +20,23 @@ format:
       - top=0.5in
       - left=1in
       - right=1in
-      - bottom=1in
+      - bottom=0.75in
 ---
 
 \thispagestyle{empty}
 
-**To:** DAGE & Dr. Adam Ross Nelson
+**Re:** \[Is the distribution of Dominant Apprehension Types balanced?\]
 
-**Re:** \[Are there differences in dominant apprehension type?\]
+The distribution of dominant apprehension types (either group discussions or solo conversations) is grossly imbalanced across all possible categories (group discussions, solo conversations, and equal apprehension) but becomes roughly balanced when excluding the equal apprehension group.
 
-To determine if our data supports pursuing the open-text classification research question, EDA examined the distribution of respondents' "biggest fear".
+{{< embed ../../scripts/eda_dependents.qmd#apprehension_grid >}}
 
-{{< embed ../../scripts/eda_dependents.qmd#dominant_apprehension_bar >}}
+This mild imbalance is still very suitable for binary classification.
 
-When comparing dominating apprehension types, solo conversation was only slightly more abundant. This mild imbalance is still very suitable for binary classification.
-
-Only \~10% of respondents were equal on both types, however. This would be a very imbalanced and difficult to use sample for 3-way classification. [My recommendation is to pursue **binary classification** for this problem.]{.underline}
+Roughly \~10% of respondents were equal on both types, however. This would be a very imbalanced and difficult to use sample for 3-way classification. [My recommendation is to pursue **binary classification** for this problem.]{.underline}
 
 Note that this decision requires excluding the 16 ‘Equal’ observations from training and validation sets, as well as rendering them unusable for generating most performance metrics in the test set. Confidence values for predictions on ‘Equal’ observations could still be useful for evaluating model calibration, with a well-calibrated model being expected to make low-confidence predictions for such observations.
+
+*NOTE: The engineering of 'Dominant Transportation Method' occurs in the clean_data.qmd script.*
+
+*NOTE: Rendering of the above figures occurs in the eda_dependents.qmd script.*
