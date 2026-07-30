@@ -92,18 +92,18 @@ ggplot(survey_ap, aes(x = solo_apprehension, y = group_apprehension)) +
 #| fig-width: 6
 #| fig-height: 4
 #| out-width: 25%
-survey_ap |>
+p_ap_3bar <- survey_ap |>
   mutate(biggest_fear = biggest_fear |>
            replace_na("NA") |>
-           factor(levels = c("solo_apprehension", "NA", "group_apprehension"))) |>
+           factor(levels = c("solo_apprehension", "equal", "group_apprehension"))) |>
   ggplot(aes(x = biggest_fear, fill = biggest_fear)) +
   geom_bar() +
   geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.3) +
   scale_x_discrete(
     labels = c(
-      "solo_apprehension"  = "Solo Conversation",
-      "group_apprehension" = "Group Discussion",
-      "NA"                 = "Equal"
+      "solo_apprehension"  = "Solo\nConversation",
+      "group_apprehension" = "Group\nDiscussion",
+      "equal"                 = "Equal"
     )
   ) +
   scale_fill_discrete(guide = "none") +
@@ -113,6 +113,83 @@ survey_ap |>
     x = "Biggest Fear",
     y = "Count"
   )
+```
+
+```{R}
+#| label: dominant_apprehension_2bar
+#| fig-width: 6
+#| fig-height: 4
+#| out-width: 25%
+p_ap_2bar <- survey_ap |>
+  filter(biggest_fear %in% c("solo_apprehension", "group_apprehension")) |>
+  mutate(biggest_fear = factor(biggest_fear, levels = c("solo_apprehension", "group_apprehension"))) |>
+  ggplot(aes(x = biggest_fear, fill = biggest_fear)) +
+  geom_bar() +
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.3) +
+  scale_x_discrete(
+    labels = c(
+      "solo_apprehension"  = "Solo\nConversation",
+      "group_apprehension" = "Group\nDiscussion"
+    )
+  ) +
+  scale_fill_discrete(guide = "none") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  labs(
+    title = 'Dominant Apprehension Type is Roughly Equal',
+    x = "Biggest Fear",
+    y = "Count"
+  )
+```
+
+```{r}
+#| label: apprehension_grid
+#| fig-width: 6
+#| fig-height: 4
+library(tidyverse)
+library(patchwork)
+library(grid)
+
+p_ap1 <- survey_ap |>
+  mutate(biggest_fear = biggest_fear |>
+           replace_na("NA") |>
+           factor(levels = c("solo_apprehension", "equal", "group_apprehension"))) |>
+  ggplot(aes(x = biggest_fear, fill = biggest_fear)) +
+  geom_bar() +
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.3) +
+  scale_x_discrete(
+    labels = c(
+      "solo_apprehension"  = "Solo\nConversation",
+      "group_apprehension" = "Group\nDiscussion",
+      "equal"              = "Equal"
+    )
+  ) +
+  scale_fill_discrete(guide = "none") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  labs(title = NULL, x = NULL, y = "Count")
+
+p_ap2 <- survey_ap |>
+  filter(biggest_fear %in% c("solo_apprehension", "group_apprehension")) |>
+  mutate(biggest_fear = factor(biggest_fear, levels = c("solo_apprehension", "group_apprehension"))) |>
+  ggplot(aes(x = biggest_fear, fill = biggest_fear)) +
+  geom_bar() +
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.3) +
+  scale_x_discrete(
+    labels = c(
+      "solo_apprehension"  = "Solo\nConversation",
+      "group_apprehension" = "Group\nDiscussion"
+    )
+  ) +
+  scale_fill_discrete(guide = "none") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  labs(title = NULL, x = NULL, y = "Count")
+
+x_label_ap <- wrap_elements(
+  full = textGrob("Biggest Fear", gp = gpar(fontsize = 11))
+)
+
+(p_ap1 | p_ap2) / x_label_ap +
+  plot_layout(heights = c(15, 1)) +
+  plot_annotation(title = "Dominant Apprehension Type is Roughly Equal")
 ```
 
 ## EDA of transportation scores
@@ -142,7 +219,7 @@ ggplot(survey_ts, aes(x = rideshare_count, y = public_transit_count)) +
 survey_ts |>
   mutate(highest_transport = highest_transport |>
            replace_na("NA") |>
-           factor(levels = c("rideshare", "NA", "public_transit"))) |>
+           factor(levels = c("rideshare", "neither", 'equal', "public_transit"))) |>
   ggplot(aes(x = highest_transport)) +
   geom_bar()
 ```
@@ -153,18 +230,19 @@ survey_ts |>
 #| fig-width: 6
 #| fig-height: 4
 #| out-width: 25%
-survey_ts |>
+p_all_categories <- survey_ts |>
   mutate(highest_transport = highest_transport |>
            replace_na("NA") |>
-           factor(levels = c("rideshare", "NA", "public_transit"))) |>
+           factor(levels = c("rideshare", "neither", "equal", "public_transit"))) |>
   ggplot(aes(x = highest_transport, fill = highest_transport)) +
   geom_bar() +
-  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.3) +
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.3, size = 3) +
   scale_x_discrete(
     labels = c(
-      "rideshare"  = "Rideshare\nServices",
+      "rideshare"  = "Ride-\nshare",
       "public_transit" = "Public\nTransit",
-      "NA"                 = "Equal"
+      "neither"                = "Neither",
+      "equal"                    = "Equal"
     )
   ) +
   scale_fill_discrete(guide = "none") +
@@ -173,5 +251,54 @@ survey_ts |>
     title = 'Dominant Transportation Method is Imbalanced',
     x = "Dominant Transportation Method",
     y = "Count"
-  )
+  ) +
+  theme(axis.text.x = element_text(size = 8))
+```
+
+```{r}
+#| label: transit_vs_other_bar
+#| fig-width: 6
+#| fig-height: 4
+#| out-width: 25%
+p_transit_vs_other <- survey_ts |>
+  mutate(transport_group = if_else(
+    highest_transport == "public_transit", "public_transit", "other",
+    missing = "other"
+  ) |> factor(levels = c("other", "public_transit"))) |>
+  ggplot(aes(x = transport_group, fill = transport_group)) +
+  geom_bar() +
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.3, size = 3) +
+  scale_x_discrete(
+    labels = c(
+      "public_transit" = "Public Transit",
+      "other"          = "All Others"
+    )
+  ) +
+  scale_fill_discrete(guide = "none") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  labs(
+    title = 'Dominant Transportation Method is Imbalanced',
+    x = "Dominant Transportation Method",
+    y = "Count"
+  ) +
+  theme(axis.text.x = element_text(size = 8))
+```
+
+```{r}
+#| label: transportation_grid
+#| fig-width: 6
+#| fig-height: 4
+library(patchwork)
+library(grid)
+
+p1 <- p_all_categories + labs(title = NULL, x = NULL)
+p2 <- p_transit_vs_other + labs(title = NULL, x = NULL)
+
+x_label <- wrap_elements(
+  full = textGrob("Dominant Transportation Method", gp = gpar(fontsize = 11))
+)
+
+(p1 | p2) / x_label +
+  plot_layout(heights = c(15, 1)) +
+  plot_annotation(title = "Dominant Transportation Method is Imbalanced")
 ```
