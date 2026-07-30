@@ -45,6 +45,8 @@ The results show that ReLU achieved the highest validation macro-F1 score of 0.5
 
 These results indicate that ReLU is the most effective choice for this neural network architecture when predicting transportation mode from open-ended text responses.
 
+Link to this test: https://github.com/emilyhuffaker/DAGE/blob/main/scripts/activation_functions_test.py
+
 ## What Questions or Uncertainties Remain?
 
 Would these activation function rankings remain consistent with different architectures or hyperparameters?
