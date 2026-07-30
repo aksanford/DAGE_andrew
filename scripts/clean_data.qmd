@@ -135,6 +135,7 @@ exported.
 ## Processing for apprehension research Q
 
 ```{r}
+#| label: "apprehension_engineering"
 # Identify forward and reverse-coded Q's (Higher scores = more apprehensive)
 forward_code <- c(
   "q1_dislike_groupdiscussion",
@@ -205,7 +206,7 @@ survey <- survey |>
     biggest_fear = case_when(
       group_apprehension > solo_apprehension ~ "group_apprehension",
       solo_apprehension > group_apprehension ~ "solo_apprehension",
-      .default = NA)
+      .default = "equal")
   )
 ```
 
@@ -245,7 +246,8 @@ survey <- survey |>
     highest_transport = case_when(
       public_transit_count > rideshare_count ~ "public_transit",
       rideshare_count > public_transit_count ~ "rideshare",
-      .default = NA)
+      public_transit_count == 0 & rideshare_count == 0 ~ "neither",
+      .default = "equal" )
     )
 ```
 
