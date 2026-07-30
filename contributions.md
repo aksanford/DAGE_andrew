@@ -93,11 +93,11 @@ The last bullet in each section asks which portion of the data science process y
 
 ## Student 4: [Dasey Dang] (`daseydang`)
 
-- **The component I "owned" and that I summarize here is best described as**
-- **You can find this contribution in a file called** `filename.qmd` **at lines** XX–YY.
-- **Owning this component means**
-- **The commits or PRs that are most relevant are**
-- **The portion of the data science process that this effort contributes to is**
+- **The component I "owned" and that I summarize here is best described as** the neural network modelling script used to predict dominant transportation mode from open-ended responses.
+- **You can find this contribution in a file called** `nn_model.py` within the `DAGE/scripts/` directory.
+- **Owning this component means** that I adapted and implemented the modelling workflow using `aksanford`’s `proj_bible_example` as a reference.
+- **The commits or PRs that are most relevant are** [insert commit or PR link].
+- **The portion of the data science process that this effort contributes to is** stage 4, **modelling**, and stage 5, **evaluation**.
 
 ---
 
