@@ -67,13 +67,17 @@ The last bullet in each section asks which portion of the data science process y
 
 ---
 
-## Student 2: [Emily Huffaker] (`emilyhuffaker')
+## Student 2: Emily Huffaker (`emilyhuffaker`)
 
-- **The component I "owned" and that I summarize here is best described as**
-- **You can find this contribution in a file called** `filename.qmd` **at lines** XX–YY.
-- **Owning this component means**
-- **The commits or PRs that are most relevant are**
-- **The portion of the data science process that this effort contributes to is**
+- **The component I "owned" and that I summarize here is best described as** the neural-network activation-function comparison. I tested ReLU, tanh, Leaky ReLU, and GELU to determine which hidden-layer activation produced the strongest validation macro-F1 score when predicting dominant transportation mode from participants’ open-ended responses.
+
+- **You can find this contribution in** `scripts/activation_functions_test.py`, where the activation functions are tested while holding the model architecture, Adam optimizer, data split, and training settings constant. The results are summarized in `memos/memos_emily/Emily_memo.pdf`, and the sources used in the memo were added to `references.bib`. [Permalink to activation-function script](https://github.com/emilyhuffaker/DAGE/blob/bf9a2c4f81ef2fba6d16339b107d047a3b3c3cde/scripts/activation_functions_test.py), [permalink to research memo](https://github.com/emilyhuffaker/DAGE/blob/63b878727fa64b2fdbde56dc8744a6693785bed6/memos/memos_emily/Emily_memo.pdf), and [permalink to bibliography]((https://github.com/emilyhuffaker/DAGE/blob/main/references.bib)).
+
+- **Owning this component means** I adapted the group’s neural-network pipeline to compare four hidden-layer activation functions, kept the remaining modeling choices constant for a fair comparison, calculated validation macro-F1 and accuracy, and created a visual summary of the results. I also wrote the research memo and added the supporting sources to the project bibliography.
+
+- **The commits or PRs that are most relevant are** [activation-function analysis commit](https://github.com/emilyhuffaker/DAGE/commit/bf9a2c4f81ef2fba6d16339b107d047a3b3c3cde), [research memo commit](https://github.com/emilyhuffaker/DAGE/commit/63b878727fa64b2fdbde56dc8744a6693785bed6), and [bibliography update commit](https://github.com/emilyhuffaker/DAGE/commit/1dd08fa2c827386abcf0c3a2661d262882cb9bf1).
+
+- **The portions of the data science process that this effort contributes to are** stage 5, **Select + Apply**, and stage 6, **Check + Recheck**. The work primarily involved applying and comparing several neural-network activation functions, then evaluating their performance on held-out validation data using macro-F1 because the outcome classes were imbalanced. It also contributes to **visualization and communication** through the comparison figure, research memo, and supporting references.
 
 ---
 
@@ -88,18 +92,6 @@ The last bullet in each section asks which portion of the data science process y
 ---
 
 ## Student 4: [Dasey Dang] (`daseydang`)
-
-- **The component I "owned" and that I summarize here is best described as**
-- **You can find this contribution in a file called** `filename.qmd` **at lines** XX–YY.
-- **Owning this component means**
-- **The commits or PRs that are most relevant are**
-- **The portion of the data science process that this effort contributes to is**
-
----
-
-## Student 5: [Full Name] (`github-username`)
-
-*[Delete this section if your group has four members.]*
 
 - **The component I "owned" and that I summarize here is best described as**
 - **You can find this contribution in a file called** `filename.qmd` **at lines** XX–YY.
