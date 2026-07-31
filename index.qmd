@@ -78,7 +78,7 @@ After numericizing values from a participants' survey responses, relevant questi
 - If both scores have a value \> 0, but are still equal, a participant is assigned to the 'equal' category (indicated equal usage of both methods)
 - If there was a greater value between estimated rideshare usage and estimated public transit usage, a participant was assigned to the category with higher usage.
 
-{{< embed ../../scripts/eda_dependents.qmd#transportation_grid >}}
+{{< embed scripts/eda_dependents.qmd#transportation_grid >}}
 
 The distribution of Dominant Transportation Methods was grossly imbalanced when considering all possible categories (rideshare, public transit, neither, equal), however the distribution became roughly balanced when collapsing categories down to public transit vs. all other possibilities combined. Our group elected to collapse categories as such in order to enable a binary classification approach using a relatively balanced sample.
 
@@ -184,6 +184,42 @@ The following are a list of tools utilized throughout the project:
 
 Both models utilized similar neural network models to accomplish their tasks, with slight differences in model architectures and hyperparameter values that were individualized during model tuning.
 
+### Model Architectures
+
 With both models taking natural language data as inputs, the first step was to tokenize each vocabulary set, then vectorize participant responses accordingly. Both models tokenized on whole words, employed a maximum vocabulary size of 5000 tokens, and a maximum sequence length of 100 tokens. The vocabulary size limit means that only the 5000 most common words across the training set were given a unique token identifier, with any other rare words being assigned to a placeholder token value indicating that this word was not included in the vocabulary. The sequence length limit means that any responses longer than 100 words were truncated.
 
-Each model then created a unique set of word embeddings with training data
+Vectorized responses for each model are then passed into an embedding layer, which through training will learn dense numeric vector representations for each unique token. These embeddings allow the network to capture statistical relationships between words, resulting in words that contribute similarly to classification developing similar embedding vectors. These associations may emerge among words that are more unique to either solo conversation apprehension or group discussion apprehension, for example.
+
+Each full sequence of word embeddings proceeds to a global average pooling layer that compresses the expanded embedding sequence back down into a single vector representation of the response. Global average pooling means that each embedding dimension is averaged across all 100 token positions in the sequence, discarding information regarding word order to produce a compact vector representation that summarizes what ‘kinds’ of words appear in each response overall. Where the original text vector only contained discrete token indices, the pooled representation has now encoded information that was captured within the learned embeddings.
+
+Pooled representations then enter a fully connected dense layer using ReLU as the activation function. Each unit here learns a weighted combination of the pooled embedding features, indicating which combinations of lexical or stylistic features are most meaningful for discriminating between classes. ReLU is important here as a non-linear activation function, allowing the network to learn more complex decision boundaries. In short, the dense layer transforms the pooled representations within feature space towards representations that will be more easily separated by the final output layer.
+
+Following the dense ReLU layer, a dropout layer was applied as a form of regularization during training. The dropout rate (e.g., 0.2), assigns a proportion of units from the dense layer to be randomly deactivated for each training batch. This step protects against the network relying too heavily on any single unit or narrow combination of features. In the context of this natural language data, dropout here effectively protects from behaviors such as the network relying too much on the presence or absence of a small set of keywords or stylistic markers to make accurate classifications, and/or the network strongly memorizing and overfitting to training data with an adverse effect on performance with held-out data. What is encouraged instead is for the network to learn broader patterns that will lead to a greater ability to generalize. Note here that the dropout layer is only active during training, with test set predictions being made with all units remaining active after having ideally benefited from the dropout procedure.
+
+Last is the output layer consisting of one unit using a Sigmoid activation function and sparse categorical cross-entropy loss function to classify responses for each research question. Sigmoid converts the hidden layer representations into a probability that the response belongs in the positive class. Positive and negative classes are arbitrary for our research questions and were randomly assigned, for instance with solo conversation apprehension being assigned as the positive class versus group discussion apprehension being the negative class. The only implication of this decision is that the network is technically just calculating the probability that a response belongs to an individual whose dominant apprehension type is solo conversations, with a conventional threshold of 0.5. If the output layer produces a value above 0.5, a response is classified as solo-conversation apprehension dominant, and group-discussion apprehension dominance ins assigned for probabilities below 0.5.
+
+### Information Flow Through the Network
+
+Under the guidance of this explanation, consider now how a test pattern may flow through the fully trained network, shifting to an example from the transportation methods model:
+
+A text response is passed into the vectorization layer and numericized. “I love riding the bus” becomes a vector such as \[47, 1, 33, 124, 1, 0, … 0\] with a unique value representing each retained word. The Keras TextVectorization layer assigns values of 1 to any word excluded from the restricted vocabulary size of 10,000. Values of 0 are used as padding between the last word and remaining positions before reaching the fixed sequence length of 100 tokens.
+
+When the vectorized response passes through the embedding layer, each token integer is converted into an associated embedding vector to create a dense representation of the response. For example, the word assigned an index value of 42 will now become its own multi-dimensional vector, ex: \[0.42, -0.37, 0.06, 0.94, …, 0.04\]. These embeddings are the learned representations that encode relationships between words with similar usage patterns and related stylistic/lexical features. Tokens for related words such as “bus”, “train”, and “subway”, for instance, may now occupy nearby regions in embedding space. The verse itself has now expanded from a one-dimensional vector of sequence length 100 into a two-dimensional tensor, similar in structure to a feature matrix.
+
+The global average pooling layer now performs a relatively simple operation. For all embedding dimensions, this layer computes the mean value across all token positions. The two-dimensional tensor is thereby compressed back down to a one-dimensional vector containing the average activation of each embedding dimension throughout the response.
+
+The purpose of the dense layer is to reorganize this representation in feature space to make it more easily separable into the binary classes. The pooled embedding features are transformed through weighted combinations the network learns are most informative for classification. The resulting vector is then fed into the output layer.
+
+Lastly, the output layer uses this transformed representation to generate the probabilities for the positive class, as discussed earlier. During training, dropout would also have been applied with a proportion of the dense layer units deactivated, and prediction error would backpropagate through the network to update weights throughout the embedding, dense and output layers.
+
+### Behavior and Performance
+
+The behavior of interest for this project is the categorical prediction of unseen verses by the fully trained network, with performance being measured in terms of accuracy. Because our classes are slightly imbalanced for each research question, accuracy is a somewhat inflated metric of model performance, however its native support in our Tensorflow/Keras workflow led our group to elect to continue using this metric while acknowledging its limitations.
+
+## Results
+
+### Dominant Transportation Methods
+
+### Dominant Apprehension Types
+
+## Analysis
