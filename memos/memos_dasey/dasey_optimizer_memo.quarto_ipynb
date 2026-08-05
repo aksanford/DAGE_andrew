@@ -1,0 +1,59 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: \"Dasey's Research Memo\"\n",
+        "jupyter: python3\n",
+        "format:\n",
+        "  html:\n",
+        "    toc: false\n",
+        "    embed-resources: true\n",
+        "execute:\n",
+        "  echo: false\n",
+        "  warning: false\n",
+        "  message: false\n",
+        "---\n",
+        "\n",
+        "**Researcher:** Dasey Dang\n",
+        "**Date:** July 29, 2026\n",
+        "\n",
+        "**Research Or Analytical Question:**\n",
+        "Which optimizer produces the strongest validation performance for a three-class neural network predicting transportation-use dominance from participants' open-ended descriptions of their ideal transportation?\n",
+        "\n",
+        "## Answer, Response, + Summary of Results\n",
+        "\n",
+        "Adam is the most effective of the three optimizers tested for this neural-network architecture and data split.\n",
+        "\n",
+        "Using the transportation modeling data, I compared Adam, RMSprop, and stochastic gradient descent (SGD) while holding the neural-network architecture constant. The outcome included three classes: public transit dominant, rideshare dominant, and no dominant mode. The data were divided using a stratified 70/15/15 train, validation, and test split with a fixed seed of 1738.\n",
+        "\n",
+        "Because the outcome classes were imbalanced, macro-F1 was used as the primary validation metric. Adam produced the strongest validation performance with a macro-F1 of **0.4270** and validation accuracy of **0.6250**. RMSprop and SGD each produced a macro-F1 of **0.2342** and validation accuracy of **0.5417**.\n",
+        "\n",
+        "![](optimizer_comparison.png){fig-alt=\"Bar chart comparing validation macro-F1 across Adam, RMSprop, and SGD.\" width=70%}\n",
+        "\n",
+        "## What questions or uncertainties remain? (Need not be exhaustive)\n",
+        "\n",
+        "Would class weighting improve the model's ability to classify rideshare-dominant cases?\n",
+        "\n",
+        "Would Adam remain the strongest optimizer if learning rates were separately tuned for Adam, RMSprop, and SGD?\n",
+        "\n",
+        "How stable are these optimizer results across different reproducible train, validation, and test splits?\n",
+        "\n",
+        "Would the relative performance of the optimizers change with a larger sample, particularly with more rideshare-dominant observations?"
+      ],
+      "id": "6243f0e5"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "C:\\Users\\Andrew\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\share\\jupyter\\kernels\\python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}
