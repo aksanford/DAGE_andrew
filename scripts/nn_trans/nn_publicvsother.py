@@ -88,7 +88,7 @@ tf.random.set_seed(SEED)
 
 # This assumes this script is stored inside DAGE/scripts/.
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
+PROJECT_DIR = Path(__file__).resolve().parents[2]
 
 DATA_DIR = PROJECT_DIR / "data_clean"
 

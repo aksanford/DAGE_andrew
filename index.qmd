@@ -3,6 +3,7 @@ title: "index.qmd"
 author: "DAGE"
 format: html
 editor: visual
+engine: jupyter
 ---
 
 # Neural Network Classification of Open-Text Survey Responses
@@ -78,7 +79,7 @@ After numericizing values from a participants' survey responses, relevant questi
 - If both scores have a value \> 0, but are still equal, a participant is assigned to the 'equal' category (indicated equal usage of both methods)
 - If there was a greater value between estimated rideshare usage and estimated public transit usage, a participant was assigned to the category with higher usage.
 
-{{< embed scripts/eda_dependents.qmd#transportation_grid >}}
+{{< embed scripts/eda/eda_dependents.qmd#transportation_grid >}}
 
 The distribution of Dominant Transportation Methods was grossly imbalanced when considering all possible categories (rideshare, public transit, neither, equal), however the distribution became roughly balanced when collapsing categories down to public transit vs. all other possibilities combined. Our group elected to collapse categories as such in order to enable a binary classification approach using a relatively balanced sample.
 
@@ -158,7 +159,7 @@ survey <- survey |>
 
 After numericizing Likert scale values from a participants PRCA responses, relevant questions were sorted into these two groups, depending on which type of apprehension each question targeted. Each group then had the corresponding numeric Likert scale values averaged to calculate the composite scores for 'average group discussion apprehension' and 'average solo conversation apprehension'. Finally, the Dominant Apprehension Type takes the largest of these two values and codes for the corresponding group, or indicates if both scores are equal.
 
-{{< embed ../../scripts/eda_dependents.qmd#apprehension_grid >}}
+{{< embed scripts/eda/eda_dependents.qmd#apprehension_grid >}}
 
 The distribution of dominant apprehension types (either group discussions or solo conversations) was grossly imbalanced across all possible categories (group discussions, solo conversations, and equal apprehension) but becomes roughly balanced when excluding the equal apprehension group. Our group elected to exclude equal apprehension responses to enable a binary classification approach with a relatively balanced sample.
 
@@ -216,10 +217,145 @@ Lastly, the output layer uses this transformed representation to generate the pr
 
 The behavior of interest for this project is the categorical prediction of unseen verses by the fully trained network, with performance being measured in terms of accuracy. Because our classes are slightly imbalanced for each research question, accuracy is a somewhat inflated metric of model performance, however its native support in our Tensorflow/Keras workflow led our group to elect to continue using this metric while acknowledging its limitations.
 
+
 ## Results
 
 ### Dominant Transportation Methods
 
+
 ### Dominant Apprehension Types
 
+
 ## Analysis
+
+### Ablation test
+
+We did an anlysis of the most common words within all of the classes described by Andrews memo.
+The results are shown in the following table. 
+
+```{python}
+import re
+from collections import Counter
+
+import numpy as np
+import pandas as pd
+from IPython.display import Markdown, display
+
+DATA_PATH = "data_clean/PRCA_FileC_clean.csv"
+
+STOPWORDS = {
+    'a','about','all','also','am','an','and','are','as','at','be','been','being','but','by','can','could','did','do','does','doing','don','dont','for','from','get','go','got','had','has','have','he','her','him','his','how','i','if','in','is','it','its','just','like','ll','m','me','more','much','my','no','not','of','on','one','or','our','out','over','re','s','she','so','some','t','than','that','the','their','them','then','there','they','this','to','too','up','us','use','used','ve','very','was','we','were','what','when','where','which','who','will','with','would','you','your'
+}
+
+USAGE_MONTHLY = {
+    'Never': 0,
+    '0-1 days a month': 1,
+    '2-4 days a month': 3,
+    '4-8 days a month': 6,
+    '8 or more days a month': 8,
+}
+USAGE_DAILY = {
+    '1-2 rides in a typical day': 1.5,
+    '3-4 rides in a typical day': 3.5,
+    '5-6 rides in a typical day': 5.5,
+    '7 or more rides in a typical day': 7,
+}
+TRANSPORT_COLS = ['Q26', 'Q27', 'Q28', 'Q29']
+
+
+def tokenize(text):
+    if pd.isna(text):
+        return []
+    text = str(text).lower()
+    text = re.sub(r'[^\w\s]', ' ', text)
+    return [t.strip("'") for t in text.split() if t.strip("'")]
+
+
+def extract_classes(df):
+    df = df.copy()
+    df['q26_num'] = df['Q26'].map(USAGE_MONTHLY)
+    df['q27_num'] = df['Q27'].map(USAGE_DAILY)
+    df['q28_num'] = df['Q28'].map(USAGE_MONTHLY)
+    df['q29_num'] = df['Q29'].map(USAGE_DAILY)
+    df['public_transit_count'] = df['q26_num'] * df['q27_num']
+    df['rideshare_count'] = df['q28_num'] * df['q29_num']
+    trans_cond = [
+        df['public_transit_count'] > df['rideshare_count'],
+        df['rideshare_count'] > df['public_transit_count'],
+    ]
+    trans_choices = ['Public Transit', 'Rideshare']
+    df['highest_transport'] = np.select(trans_cond, trans_choices, default='Equal')
+    return df
+
+
+df = pd.read_csv(DATA_PATH)
+df = extract_classes(df)
+tr_df = df[df["Q19"].notna() & df[TRANSPORT_COLS].notna().all(axis=1)].copy()
+
+for cls in sorted(tr_df["highest_transport"].dropna().unique()):
+    tokens = tr_df.loc[tr_df["highest_transport"] == cls, "Q19"].astype(str).apply(tokenize)
+    all_words = [t for toks in tokens for t in toks]
+    content_words = [w for w in all_words if w not in STOPWORDS]
+    counter = Counter(content_words)
+    top = counter.most_common(10)
+    n_cases = len(tokens)
+    table_df = pd.DataFrame(top, columns=["Word", "Frequency"])
+    table_df.insert(0, "Rank", range(1, len(table_df) + 1))
+    header = "| " + " | ".join(table_df.columns) + " |"
+    sep = "|" + "|".join(["---" for _ in table_df.columns]) + "|"
+    rows = []
+    for _, row in table_df.iterrows():
+        rows.append("| " + " | ".join(str(v) for v in row) + " |")
+    table_md = "\n".join([header, sep] + rows)
+
+    display(
+        Markdown(
+            f"**{cls} (n = {n_cases})**\n\n" + table_md
+        )
+    )
+```
+
+As described in this table the words most indicative of the transportation class are the words 
+"bus" and "walking" for the public transportation class.
+
+
+
+### Model comparison: with vs. without "bus" and "walking"
+
+The two scripts below train the same binary public-transit-vs-other neural network. The first uses the raw responses; the second removes the words "bus" and "walking" before training to measure their contribution.
+
+- [scripts/nn_trans/nn_publicvsother.py](cci:7://file:///c:/Users/grant/Projects_PSYCH_755/final_project/DAGE/scripts/nn_trans/nn_publicvsother.py:0:0-0:0)
+- [scripts/nn_publicvsother_no_bus_walking.py](cci:7://file:///c:/Users/grant/Projects_PSYCH_755/final_project/DAGE/scripts/nn_publicvsother_no_bus_walking.py:0:0-0:0)
+
+```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+from pathlib import Path
+
+ORIG_SUMMARY = "model_outputs/nn_transportation/public_transit_vs_other_summary.csv"
+ABLATION_SUMMARY = "model_outputs/nn_transportation_no_bus_walking/public_transit_vs_other_summary.csv"
+
+rows = []
+for path, label in [(ORIG_SUMMARY, "Original"), (ABLATION_SUMMARY, "No bus/walking")]:
+    if Path(path).exists():
+        df = pd.read_csv(path)
+        df["model"] = label
+        rows.append(df)
+
+if rows:
+    summary = pd.concat(rows, ignore_index=True)
+    cols = ["model", "test_accuracy", "test_precision", "test_recall", "test_f1"]
+    display(summary[cols])
+
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.bar(summary["model"], summary["test_accuracy"], color=["#2c5aa0", "#c44e52"])
+    ax.set_ylabel("Test accuracy")
+    ax.set_title("Public transit vs. other: test accuracy")
+    ax.set_ylim(0, 1)
+    for i, v in enumerate(summary["test_accuracy"]):
+        ax.text(i, v + 0.02, f"{v:.3f}", ha="center")
+    plt.tight_layout()
+    plt.show()
+else:
+    print("Model summary files not found. Run the two nn_publicvsother scripts first.")
+```
