@@ -1,0 +1,12 @@
+{
+    "chatSatelliteState": {
+        "poppedOut": false,
+        "geometry": {
+            "ordinal": 0,
+            "x": 710,
+            "y": 17,
+            "width": 500,
+            "height": 611
+        }
+    }
+}
