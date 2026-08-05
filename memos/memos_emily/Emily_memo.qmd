@@ -30,43 +30,50 @@ execute:
 **Researcher:** Emily Huffaker  
 **Date:** July 29, 2026
 
-**Research Question:** When using open-ended descriptions to predict dominant transportation mode, which activation function achieves the best F1 score?
+**Research Question:** When using open-ended descriptions to predict dominant transportation mode, which hidden-layer activation function achieves the highest validation macro-F1 score?
 
 ```{python}
 #| label: setup-results
 #| include: false
 
+from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Results produced by scripts/activation_functions_test.py
-results = pd.DataFrame({
-    "Activation Function": [
-        "ReLU",
-        "tanh",
-        "GELU",
-        "Leaky ReLU"
-    ],
-    "Validation Macro-F1": [
-        0.536,
-        0.474,
-        0.447,
-        0.444
-    ],
-    "Validation Accuracy": [
-        0.667,
-        0.583,
-        0.542,
-        0.542
-    ],
-    "Epochs Trained": [
-        50,
-        41,
-        47,
-        45
-    ]
-})
+# Find the results file in the DAGE repository
+results_file = None
 
+for folder in [Path.cwd(), *Path.cwd().parents]:
+    possible_file = (
+        folder
+        / "results"
+        / "activation_function_results.csv"
+    )
+
+    if possible_file.exists():
+        results_file = possible_file
+        break
+
+if results_file is None:
+    raise FileNotFoundError(
+        "Could not find results/activation_function_results.csv. "
+        "Run scripts/activation_functions_test.py first."
+    )
+
+# Read the results produced by activation_functions_test.py
+results = pd.read_csv(results_file)
+
+# Rename columns for display in the memo
+results = results.rename(
+    columns={
+        "activation": "Activation Function",
+        "validation_macro_f1": "Validation Macro-F1",
+        "validation_accuracy": "Validation Accuracy",
+        "epochs_trained": "Epochs Trained"
+    }
+)
+
+# Rank activation functions from highest to lowest macro-F1
 results = (
     results
     .sort_values(
@@ -76,6 +83,7 @@ results = (
     .reset_index(drop=True)
 )
 
+# Save the top two results for the written summary
 best_activation = results.loc[
     0,
     "Activation Function"
