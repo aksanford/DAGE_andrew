@@ -6,13 +6,23 @@ data_org/*
 data_clean/*
 
 /.quarto/
+/.quarto/project-cache/deno-kv-file
+/.quarto/xref/INDEX
 **/*.quarto_ipynb
 _quarto.yml
 .venv
 __pycache__/
 .DS_Store
+.env
 model_outputs/
 scripts/clean_data.html
+
+# Rendered outputs
+index.html
+index_files/
+scripts/eda/*.html
+scripts/eda/*_files/
+*.embed-preview.html
 
 # Rendered memo outputs
 memos/memos_grant/*.html

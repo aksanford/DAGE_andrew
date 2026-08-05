@@ -6,16 +6,11 @@ format:
     toc: true
     toc-depth: 3
 editor: visual
+engine: jupyter
 execute:
   freeze: auto
 ---
 
-```{r}
-#| include: false
-library(reticulate)
-# Use system Python 3.11 where packages are installed
-use_python("/Library/Frameworks/Python.framework/Versions/3.11/bin/python3", required = TRUE)
-```
 
 # Neural Network Classification of Open-Text Survey Responses
 
@@ -228,11 +223,12 @@ Lastly, the output layer uses this transformed representation to generate the pr
 
 The behavior of interest for this project is the categorical prediction of unseen verses by the fully trained network, with performance being measured in terms of accuracy. Because our classes are slightly imbalanced for each research question, accuracy is a somewhat inflated metric of model performance, however its native support in our Tensorflow/Keras workflow led our group to elect to continue using this metric while acknowledging its limitations.
 
+
 ## Results
 
 ### Dominant Transportation Methods
 
-The binary neural network predicted whether participants were public-transit dominant or belonged to the combined “other” category. The other category included rideshare-dominant participants, participants with equal estimated rideshare and public-transit use, and participants with no estimated use of either option. The model used a classification threshold selected from the validation data by maximizing public-transit F1. :contentReference[oaicite:0]{index=0}
+The binary neural network predicted whether participants were public-transit dominant or belonged to the combined “other” category. The other category included rideshare-dominant participants, participants with equal estimated rideshare and public-transit use, and participants with no estimated use of either option. The model used a classification threshold selected from the validation data by maximizing public-transit F1.
 
 ```{python}
 #| label: load-transportation-model
@@ -352,5 +348,167 @@ plt.show()
 
 ### Dominant Apprehension Types
 
-## Discussion + Next Steps
 
+## Analysis
+
+### Ablation test
+
+We did an anlysis of the most common words within all of the classes described by Andrews memo.
+The results are shown in the following table. 
+
+```{python}
+import re
+from collections import Counter
+
+import numpy as np
+import pandas as pd
+from IPython.display import Markdown, display
+
+DATA_PATH = "data_clean/PRCA_FileC_clean.csv"
+
+STOPWORDS = {
+    'a','about','all','also','am','an','and','are','as','at','be','been','being','but','by','can','could','did','do','does','doing','don','dont','for','from','get','go','got','had','has','have','he','her','him','his','how','i','if','in','is','it','its','just','like','ll','m','me','more','much','my','no','not','of','on','one','or','our','out','over','re','s','she','so','some','t','than','that','the','their','them','then','there','they','this','to','too','up','us','use','used','ve','very','was','we','were','what','when','where','which','who','will','with','would','you','your'
+}
+
+USAGE_MONTHLY = {
+    'Never': 0,
+    '0-1 days a month': 1,
+    '2-4 days a month': 3,
+    '4-8 days a month': 6,
+    '8 or more days a month': 8,
+}
+USAGE_DAILY = {
+    '1-2 rides in a typical day': 1.5,
+    '3-4 rides in a typical day': 3.5,
+    '5-6 rides in a typical day': 5.5,
+    '7 or more rides in a typical day': 7,
+}
+TRANSPORT_COLS = ['Q26', 'Q27', 'Q28', 'Q29']
+
+
+def tokenize(text):
+    if pd.isna(text):
+        return []
+    text = str(text).lower()
+    text = re.sub(r'[^\w\s]', ' ', text)
+    return [t.strip("'") for t in text.split() if t.strip("'")]
+
+
+def extract_classes(df):
+    df = df.copy()
+    df['q26_num'] = df['Q26'].map(USAGE_MONTHLY)
+    df['q27_num'] = df['Q27'].map(USAGE_DAILY)
+    df['q28_num'] = df['Q28'].map(USAGE_MONTHLY)
+    df['q29_num'] = df['Q29'].map(USAGE_DAILY)
+    df['public_transit_count'] = df['q26_num'] * df['q27_num']
+    df['rideshare_count'] = df['q28_num'] * df['q29_num']
+    trans_cond = [
+        df['public_transit_count'] > df['rideshare_count'],
+        df['rideshare_count'] > df['public_transit_count'],
+    ]
+    trans_choices = ['Public Transit', 'Rideshare']
+    df['highest_transport'] = np.select(trans_cond, trans_choices, default='Equal')
+    return df
+
+
+df = pd.read_csv(DATA_PATH)
+df = extract_classes(df)
+tr_df = df[df["Q19"].notna() & df[TRANSPORT_COLS].notna().all(axis=1)].copy()
+
+for cls in sorted(tr_df["highest_transport"].dropna().unique()):
+    tokens = tr_df.loc[tr_df["highest_transport"] == cls, "Q19"].astype(str).apply(tokenize)
+    all_words = [t for toks in tokens for t in toks]
+    content_words = [w for w in all_words if w not in STOPWORDS]
+    counter = Counter(content_words)
+    top = counter.most_common(10)
+    n_cases = len(tokens)
+    table_df = pd.DataFrame(top, columns=["Word", "Frequency"])
+    table_df.insert(0, "Rank", range(1, len(table_df) + 1))
+    header = "| " + " | ".join(table_df.columns) + " |"
+    sep = "|" + "|".join(["---" for _ in table_df.columns]) + "|"
+    rows = []
+    for _, row in table_df.iterrows():
+        rows.append("| " + " | ".join(str(v) for v in row) + " |")
+    table_md = "\n".join([header, sep] + rows)
+
+    display(
+        Markdown(
+            f"**{cls} (n = {n_cases})**\n\n" + table_md
+        )
+    )
+```
+
+As described in this table the words most indicative of the transportation class are the words 
+"bus" and "walking" for the public transportation class.
+
+
+
+### Model comparison: with vs. without "bus" and "walking"
+
+The two scripts below train the same binary public-transit-vs-other neural network. The first uses the raw responses; the second removes the words "bus" and "walking" before training to measure their contribution.
+
+- `scripts/nn_trans/nn_publicvsother.py`
+- `scripts/nn_publicvsother_no_bus_walking.py`
+
+```{python}
+#| label: load-ablation-model
+#| output: false
+#| warning: false
+
+ablation_results = runpy.run_path(
+    "scripts/nn_publicvsother_no_bus_walking.py"
+)
+```
+
+```{python}
+#| label: tbl-model-comparison
+#| tbl-cap: "Test-set performance comparison for the original model and the no-bus/walking ablation."
+
+comparison_results = pd.DataFrame(
+    {
+        "Model": ["Original", "No bus/walking"],
+        "Test accuracy": [
+            transport_results["test_accuracy"],
+            ablation_results["test_accuracy"],
+        ],
+        "Test precision": [
+            transport_results["test_precision"],
+            ablation_results["test_precision"],
+        ],
+        "Test recall": [
+            transport_results["test_recall"],
+            ablation_results["test_recall"],
+        ],
+        "Test F1": [
+            transport_results["test_f1"],
+            ablation_results["test_f1"],
+        ],
+    }
+)
+
+comparison_results.round(3)
+```
+
+As reported in @tbl-model-comparison, removing the words "bus" and "walking" changes the model’s test-set performance. The drop or change in accuracy and F1 indicates how much the model relied on those two words.
+
+```{python}
+#| label: fig-model-comparison
+#| fig-cap: "Test-set accuracy comparison for the original model and the no-bus/walking ablation."
+#| warning: false
+
+fig, ax = plt.subplots(figsize=(6, 4))
+ax.bar(
+    comparison_results["Model"],
+    comparison_results["Test accuracy"],
+    color=["#2c5aa0", "#c44e52"],
+)
+ax.set_ylabel("Test accuracy")
+ax.set_title("Public transit vs. other: original vs. ablation")
+ax.set_ylim(0, 1)
+for i, v in enumerate(comparison_results["Test accuracy"]):
+    ax.text(i, v + 0.02, f"{v:.3f}", ha="center")
+plt.tight_layout()
+plt.show()
+```
+
+## Discussion + Next Steps

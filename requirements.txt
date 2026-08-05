@@ -1,0 +1,21 @@
+# Python dependencies for DAGE final project
+# Install with: pip install -r requirements.txt
+
+# Core data science
+numpy>=1.26.4,<2.2
+pandas>=2.2.0
+
+# Machine learning
+scikit-learn>=1.5.0
+tensorflow>=2.20.0,<2.22.0
+
+# Visualization
+matplotlib>=3.9.0
+seaborn>=0.13.0
+
+# Notebook / display utilities
+jupyter
+ipython>=8.26.0
+
+# Optional: used in scripts/nn_apprehension.ipynb
+# torch>=2.4.0
