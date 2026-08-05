@@ -1,26 +1,30 @@
 ---
 title: "Research Memo: Neural Network Activation Functions"
 author: "Emily Huffaker"
-pdf-engine: xelatex
-date: 7/29/2026
+date: "July 29, 2026"
+jupyter: python3
 cache: false
+
 format:
   pdf:
-    keep-tex: true
+    pdf-engine: xelatex
     documentclass: article
     papersize: letter
-    mainfont: Times New Roman
+    mainfont: "Times New Roman"
     fontsize: 11pt
-
-    nclude-in-header:
-      text: |
-        \setkomafont{title}{\medium}
-        \pagenumbering{gobble}
     geometry:
       - top=0.5in
       - left=1in
       - right=1in
       - bottom=1in
+    include-in-header:
+      text: |
+        \pagenumbering{gobble}
+
+execute:
+  echo: false
+  warning: false
+  message: false
 ---
 
 **Researcher:** Emily Huffaker  
@@ -28,24 +32,112 @@ format:
 
 **Research Question:** When using open-ended descriptions to predict dominant transportation mode, which activation function achieves the best F1 score?
 
+```{python}
+#| label: setup-results
+#| include: false
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Results produced by scripts/activation_functions_test.py
+results = pd.DataFrame({
+    "Activation Function": [
+        "ReLU",
+        "tanh",
+        "GELU",
+        "Leaky ReLU"
+    ],
+    "Validation Macro-F1": [
+        0.536,
+        0.474,
+        0.447,
+        0.444
+    ],
+    "Validation Accuracy": [
+        0.667,
+        0.583,
+        0.542,
+        0.542
+    ],
+    "Epochs Trained": [
+        50,
+        41,
+        47,
+        45
+    ]
+})
+
+results = (
+    results
+    .sort_values(
+        "Validation Macro-F1",
+        ascending=False
+    )
+    .reset_index(drop=True)
+)
+
+best_activation = results.loc[
+    0,
+    "Activation Function"
+]
+
+best_f1 = results.loc[
+    0,
+    "Validation Macro-F1"
+]
+
+second_activation = results.loc[
+    1,
+    "Activation Function"
+]
+
+second_f1 = results.loc[
+    1,
+    "Validation Macro-F1"
+]
+```
+
 ## Answer, Response, + Summary of Results
 
 To answer this research question, I tested four different activation functions in the neural network's hidden layer while holding the architecture, optimizer (Adam), and training parameters constant. The activation functions tested were ReLU, tanh, Leaky ReLU, and GELU.
 
-![Activation function comparison](activation_comparison.png)
+```{python}
+#| label: fig-activation-comparison
+#| fig-cap: "Validation macro-F1 scores for the four activation functions."
 
-The results show that ReLU achieved the highest validation macro-F1 score of 0.536, followed by tanh with 0.474. The complete performance comparison is shown below:
+plot_results = results.sort_values(
+    "Validation Macro-F1"
+)
 
-| Activation Function | Validation Macro-F1 | Validation Accuracy | Epochs Trained |
-|:--|--:|--:|--:|
-| ReLU | 0.536 | 0.667 | 50 |
-| tanh | 0.474 | 0.583 | 41 |
-| GELU | 0.447 | 0.542 | 47 |
-| Leaky ReLU | 0.444 | 0.542 | 45 |
+plt.figure(figsize=(7, 4))
 
-These results indicate that ReLU is the most effective choice for this neural network architecture when predicting transportation mode from open-ended text responses.
+plt.barh(
+    plot_results["Activation Function"],
+    plot_results["Validation Macro-F1"]
+)
 
-Link to this test: https://github.com/emilyhuffaker/DAGE/blob/main/scripts/activation_functions_test.py
+plt.xlabel("Validation Macro-F1")
+plt.ylabel("Hidden-Layer Activation Function")
+plt.title("Validation Performance by Activation Function")
+
+plt.tight_layout()
+plt.show()
+```
+
+As shown in @fig-activation-comparison, `{python} best_activation` achieved the highest validation macro-F1 score of `{python} f"{best_f1:.3f}"`, followed by `{python} second_activation` with a score of `{python} f"{second_f1:.3f}"`.
+
+```{python}
+#| label: tbl-activation-results
+#| tbl-cap: "Validation performance for each activation function."
+
+results.set_index("Activation Function").round(3)
+```
+
+The complete performance comparison is shown in @tbl-activation-results. These results indicate that `{python} best_activation` is the most effective choice among the four activation functions tested for this neural network architecture when predicting dominant transportation mode from open-ended text responses.
+
+The full model-training code is available in the project repository:
+
+<https://github.com/emilyhuffaker/DAGE/blob/main/scripts/activation_functions_test.py>
 
 ## What Questions or Uncertainties Remain?
 
