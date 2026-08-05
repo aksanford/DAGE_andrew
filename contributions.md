@@ -45,18 +45,6 @@ The last bullet in each section asks which portion of the data science process y
 
 ---
 
-## Example (delete this section before submitting)
-
-### Jane Doe (`jdoe-wisc`)
-
-- **The component I "owned" and that I summarize here is best described as** the modeling and training or fit step — the KNN classifier that takes the cleaned feature matrix and predicts the target class, together with the grid search that chose the value of *K*.
-- **You can find this contribution in a file called** `src/models/knn.py` **at lines** 1–98, and in `manuscript.qmd` at lines 112–168 where the model is described and the grid-search results table is generated. [Permalink to `knn.py`](https://github.com/ORG/REPO/blob/a3f2c1e.../src/models/knn.py#L1-L98)
-- **Owning this component means** I chose KNN over the two other classifiers we considered (write-up in PR #21); I designed the *K*-grid (odd values from 3 to 51) and the 5-fold stratified cross-validation used to score each candidate; I wrote the fit-and-predict loop; and I debugged the scaling bug that was letting one high-variance feature dominate the distance metric. I did not build the feature matrix — Marcus did the wrangling, and he covers that in his section.
-- **The commits or PRs that are most relevant are** [#21 — model selection write-up](https://github.com/ORG/REPO/pull/21), [#24 — KNN + grid search over *K*](https://github.com/ORG/REPO/pull/24), and [a3f2c1e — scale features before distance calc](https://github.com/ORG/REPO/commit/a3f2c1e).
-- **The portion(s) of the [data science process](https://adamrossnelson.github.io/integsci375-public/readings/data_science_processes.html) that this effort contributes to is** stage 5, **Select + Apply** — reviewing candidate techniques, selecting KNN, and applying it with a grid search over *K* to produce the predictive model the manuscript reports on. It also has a foot in stage 6, **Check + Recheck**: the 5-fold cross-validation inside the grid search is where each candidate *K* is validated against held-out folds before the final *K* is chosen.
-
----
-
 ## Student 1: [Grant Mooslin] (`grantmooslin`)
 
 - The component I worked on can be best described as the doing EDA on the words for the given classes in the dataset.
@@ -92,10 +80,10 @@ The last bullet in each section asks which portion of the data science process y
 ## Student 4: [Dasey Dang] (`daseydang`)
 
 - **The component I "owned" and that I summarize here is best described as** the neural-network modeling pipeline used to predict transportation-use category from participants’ open-ended transportation responses. I developed the final binary classification workflow, including text vectorization, train-validation-test splitting, model training, class weighting, threshold selection, and evaluation using accuracy, precision, recall, F1, and confusion matrices.
-- **You can find this contribution in files called** `nn_publicvsother.py` and `nn_publicvsrideshare.py` within the `DAGE/scripts/nn_trans` directory.
-- **Owning this component means** I adapted the group’s initial neural-network approach into a working end-to-end modeling script, using `aksanford`’s `proj_bible_example` as a reference. I implemented the text-vectorization and embedding pipeline, created reproducible stratified 70/15/15 data splits, converted the transportation outcome into a binary target, addressed class imbalance through class weights, and evaluated the model on held-out validation and test data. I also debugged local and Colab execution issues involving file paths, TensorFlow environments, Quarto rendering, and model-output handling.
+- **You can find this contribution in files called** `nn_publicvsother.py` and `nn_publicvsrideshare.py` within the `DAGE/scripts/nn_trans` directory, as well as in the Dominant Transportation Methods subsection of index.qmd
+- **Owning this component means** I adapted the group’s initial neural-network approach into a working end-to-end modeling script, using `aksanford`’s `proj_bible_example` as a reference. I implemented the text-vectorization and embedding pipeline, created reproducible stratified 70/15/15 data splits, converted the transportation outcome into a binary target, addressed class imbalance through class weights, and evaluated the model on held-out validation and test data. I also embedded the executable model code and dynamically generated results into the Quarto manuscript, including labeled and captioned accuracy curves, a performance table, a confusion matrix, and cross-referenced written results. Additionally, I debugged local and Colab execution issues involving file paths, TensorFlow environments, Quarto rendering, Python environment selection, and model-output handling.
 - **The commits or PRs that are most relevant are** [#23 - Added NN for Public Transportation VS. RS/Other](https://github.com/grantmooslin/DAGE/commit/1479c42fbdb7189509e9cab1f595228cb3c2d6db) where the component was added to the repo.
-- **The portion of the data science process that this effort contributes to is** stage 5, **Select + Apply**, and stage 6, **Check + Recheck**. The work involved selecting and applying a neural-network text-classification approach, then evaluating whether the model generalized to held-out validation and test data using macro/F1, accuracy, class-specific performance, and confusion matrices. It also contributes to reproducibility and implementation through the executable modeling script and the Colab/Devin workflow used to run the complete pipeline.
+- **The portion of the data science process that this effort contributes to is** stage 5, **Select + Apply**, and stage 6, **Check + Recheck**. The work involved selecting and applying a neural-network text-classification approach, then evaluating whether the model generalized to held-out validation and test data using macro/F1, accuracy, class-specific performance, and confusion matrices. It also contributes to reproducibility and implementation through the executable modeling script and the Colab/Devin workflow used to run the complete pipeline. Embedding the executable workflow and results into index.qmd also contributed to reproducibility by ensuring that the reported metrics and visualizations were generated directly from the modeling code rather than entered manually.
 
 ---
 
@@ -103,8 +91,7 @@ The last bullet in each section asks which portion of the data science process y
 
 By adding your name below, each member affirms that the account of their own contribution is accurate, and that they have read the other four sections and believe them to be accurate as well.
 
-- [ ] [Grant Mooslin] (`grantmooslin`) — [date]
-- [ ] [Full Name] (`github-username`) — [date]
-- [ ] [Full Name] (`github-username`) — [date]
-- [ ] [Full Name] (`github-username`) — [date]
-- [ ] [Full Name] (`github-username`) — [date]
+- [X] [Grant Mooslin] (`grantmooslin`) — [8/6/26]
+- [X] [Dasey Dang] (`daseydang`) — [8/6/26]
+- [X] [Emily Huffaker] (`emilyhuffaker`) — [8/6/26]
+- [X] [Andrew Sanford] (`aksanford`) — [8/6/26]

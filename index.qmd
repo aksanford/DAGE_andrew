@@ -1,10 +1,16 @@
 ---
 title: "index.qmd"
 author: "DAGE"
-format: html
+format:
+  html:
+    toc: true
+    toc-depth: 3
 editor: visual
 engine: jupyter
+execute:
+  freeze: auto
 ---
+
 
 # Neural Network Classification of Open-Text Survey Responses
 
@@ -222,6 +228,123 @@ The behavior of interest for this project is the categorical prediction of unsee
 
 ### Dominant Transportation Methods
 
+The binary neural network predicted whether participants were public-transit dominant or belonged to the combined “other” category. The other category included rideshare-dominant participants, participants with equal estimated rideshare and public-transit use, and participants with no estimated use of either option. The model used a classification threshold selected from the validation data by maximizing public-transit F1.
+
+```{python}
+#| label: load-transportation-model
+#| output: false
+#| warning: false
+
+import runpy
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
+# Run the transportation model and retain its results.
+transport_results = runpy.run_path(
+    "scripts/nn_trans/nn_publicvsother.py"
+)
+
+history = transport_results["history"]
+test_accuracy = transport_results["test_accuracy"]
+test_precision = transport_results["test_precision"]
+test_recall = transport_results["test_recall"]
+test_f1 = transport_results["test_f1"]
+best_threshold = transport_results["best_threshold"]
+test_confusion_df = transport_results["test_confusion_df"]
+```
+
+```{python}
+#| label: fig-transportation-accuracy
+#| fig-cap: "Training and validation accuracy across neural-network training epochs."
+#| warning: false
+
+accuracy_history = pd.DataFrame(
+    {
+        "Epoch": range(
+            1,
+            len(history.history["accuracy"]) + 1,
+        ),
+        "Training accuracy": history.history["accuracy"],
+        "Validation accuracy": history.history["val_accuracy"],
+    }
+)
+
+accuracy_history = accuracy_history.melt(
+    id_vars="Epoch",
+    var_name="Dataset",
+    value_name="Accuracy",
+)
+
+sns.lineplot(
+    data=accuracy_history,
+    x="Epoch",
+    y="Accuracy",
+    hue="Dataset",
+)
+
+plt.ylim(0, 1)
+plt.xlabel("Training epoch")
+plt.ylabel("Accuracy")
+plt.tight_layout()
+plt.show()
+```
+
+As shown in @fig-transportation-accuracy, training and validation accuracy were tracked across epochs to evaluate the model’s learning behavior and determine whether its performance generalized beyond the training data.
+
+```{python}
+#| label: tbl-transportation-performance
+#| tbl-cap: "Final test-set performance for the public-transit versus other neural network."
+
+performance_results = pd.DataFrame(
+    {
+        "Metric": [
+            "Classification threshold",
+            "Accuracy",
+            "Public-transit precision",
+            "Public-transit recall",
+            "Public-transit F1",
+        ],
+        "Value": [
+            best_threshold,
+            test_accuracy,
+            test_precision,
+            test_recall,
+            test_f1,
+        ],
+    }
+)
+
+performance_results["Value"] = (
+    performance_results["Value"]
+    .round(3)
+)
+
+performance_results
+```
+
+As reported in @tbl-transportation-performance, the model achieved an accuracy of `{python} round(test_accuracy, 3)` and a public-transit F1 score of `{python} round(test_f1, 3)` on the held-out test set. Public-transit precision was `{python} round(test_precision, 3)`, while public-transit recall was `{python} round(test_recall, 3)`. Predictions were classified using a validation-selected threshold of `{python} round(best_threshold, 2)`.
+
+```{python}
+#| label: fig-transportation-confusion-matrix
+#| fig-cap: "Confusion matrix for public-transit versus other predictions on the held-out test set."
+#| warning: false
+
+sns.heatmap(
+    test_confusion_df,
+    annot=True,
+    fmt="d",
+    cbar=False,
+)
+
+plt.xlabel("Predicted transportation category")
+plt.ylabel("Actual transportation category")
+plt.tight_layout()
+plt.show()
+```
+
+@fig-transportation-confusion-matrix shows the number of correct and incorrect classifications for each outcome. Cells along the diagonal represent correct predictions, while the off-diagonal cells represent cases that the model misclassified. This provides additional context beyond overall accuracy by showing whether errors were concentrated among public-transit-dominant participants or participants in the combined other category.
 
 ### Dominant Apprehension Types
 
@@ -324,38 +447,68 @@ As described in this table the words most indicative of the transportation class
 
 The two scripts below train the same binary public-transit-vs-other neural network. The first uses the raw responses; the second removes the words "bus" and "walking" before training to measure their contribution.
 
-- [scripts/nn_trans/nn_publicvsother.py](cci:7://file:///c:/Users/grant/Projects_PSYCH_755/final_project/DAGE/scripts/nn_trans/nn_publicvsother.py:0:0-0:0)
-- [scripts/nn_publicvsother_no_bus_walking.py](cci:7://file:///c:/Users/grant/Projects_PSYCH_755/final_project/DAGE/scripts/nn_publicvsother_no_bus_walking.py:0:0-0:0)
+- `scripts/nn_trans/nn_publicvsother.py`
+- `scripts/nn_publicvsother_no_bus_walking.py`
 
 ```{python}
-import pandas as pd
-import matplotlib.pyplot as plt
-from pathlib import Path
+#| label: load-ablation-model
+#| output: false
+#| warning: false
 
-ORIG_SUMMARY = "model_outputs/nn_transportation/public_transit_vs_other_summary.csv"
-ABLATION_SUMMARY = "model_outputs/nn_transportation_no_bus_walking/public_transit_vs_other_summary.csv"
-
-rows = []
-for path, label in [(ORIG_SUMMARY, "Original"), (ABLATION_SUMMARY, "No bus/walking")]:
-    if Path(path).exists():
-        df = pd.read_csv(path)
-        df["model"] = label
-        rows.append(df)
-
-if rows:
-    summary = pd.concat(rows, ignore_index=True)
-    cols = ["model", "test_accuracy", "test_precision", "test_recall", "test_f1"]
-    display(summary[cols])
-
-    fig, ax = plt.subplots(figsize=(6, 4))
-    ax.bar(summary["model"], summary["test_accuracy"], color=["#2c5aa0", "#c44e52"])
-    ax.set_ylabel("Test accuracy")
-    ax.set_title("Public transit vs. other: test accuracy")
-    ax.set_ylim(0, 1)
-    for i, v in enumerate(summary["test_accuracy"]):
-        ax.text(i, v + 0.02, f"{v:.3f}", ha="center")
-    plt.tight_layout()
-    plt.show()
-else:
-    print("Model summary files not found. Run the two nn_publicvsother scripts first.")
+ablation_results = runpy.run_path(
+    "scripts/nn_publicvsother_no_bus_walking.py"
+)
 ```
+
+```{python}
+#| label: tbl-model-comparison
+#| tbl-cap: "Test-set performance comparison for the original model and the no-bus/walking ablation."
+
+comparison_results = pd.DataFrame(
+    {
+        "Model": ["Original", "No bus/walking"],
+        "Test accuracy": [
+            transport_results["test_accuracy"],
+            ablation_results["test_accuracy"],
+        ],
+        "Test precision": [
+            transport_results["test_precision"],
+            ablation_results["test_precision"],
+        ],
+        "Test recall": [
+            transport_results["test_recall"],
+            ablation_results["test_recall"],
+        ],
+        "Test F1": [
+            transport_results["test_f1"],
+            ablation_results["test_f1"],
+        ],
+    }
+)
+
+comparison_results.round(3)
+```
+
+As reported in @tbl-model-comparison, removing the words "bus" and "walking" changes the model’s test-set performance. The drop or change in accuracy and F1 indicates how much the model relied on those two words.
+
+```{python}
+#| label: fig-model-comparison
+#| fig-cap: "Test-set accuracy comparison for the original model and the no-bus/walking ablation."
+#| warning: false
+
+fig, ax = plt.subplots(figsize=(6, 4))
+ax.bar(
+    comparison_results["Model"],
+    comparison_results["Test accuracy"],
+    color=["#2c5aa0", "#c44e52"],
+)
+ax.set_ylabel("Test accuracy")
+ax.set_title("Public transit vs. other: original vs. ablation")
+ax.set_ylim(0, 1)
+for i, v in enumerate(comparison_results["Test accuracy"]):
+    ax.text(i, v + 0.02, f"{v:.3f}", ha="center")
+plt.tight_layout()
+plt.show()
+```
+
+## Discussion + Next Steps
