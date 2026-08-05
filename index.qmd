@@ -1,7 +1,10 @@
 ---
 title: "index.qmd"
 author: "DAGE"
-format: html
+format:
+  html:
+    toc: true
+    toc-depth: 3
 editor: visual
 execute:
   freeze: auto
@@ -349,5 +352,5 @@ plt.show()
 
 ### Dominant Apprehension Types
 
-## Analysis
+## Discussion + Next Steps
 
