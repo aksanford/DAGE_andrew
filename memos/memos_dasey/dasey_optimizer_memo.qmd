@@ -1,20 +1,22 @@
 ---
-title: "Research Memo - Best Optimizer Selection"
-author: Dasey Dang
-pdf-engine: xelatex
-date: 7/30/2026
+title: "Research Memo – Best Optimizer Selection"
+author: "Dasey Dang"
+date: "8/05/2026"
 cache: false
+jupyter: dage-memo
+
 format:
+  html:
+    embed-resources: true
+    toc: true
   pdf:
     keep-tex: true
     documentclass: article
     papersize: letter
-    mainfont: Times New Roman
+    mainfont: "Times New Roman"
     fontsize: 11pt
-
-    nclude-in-header:
+    include-in-header:
       text: |
-        \setkomafont{title}{\medium}
         \pagenumbering{gobble}
     geometry:
       - top=0.5in
@@ -25,29 +27,328 @@ format:
 
 \thispagestyle{empty}
 
-**To: DAGE & Adam Ross Nelson**
+**To:** DAGE and Adam Ross Nelson
 
-**Research Question:** \[When using open ended descriptions to predict dominant transportation mode, which optimizer produces the best F1 score?\]
+**Research Question:** When using open-ended descriptions to predict dominant transportation mode, which optimizer produces the highest validation macro-F1 score?
 
-## Answer, Response, + Summary of Results
-Adam is the most effective of the three optimizers tested for this neural-network architecture and data split. Using the transportation modeling data,
-I compared Adam, RMSprop, and stochastic gradient descent (SGD) while holding the neural-network architecture constant. The outcome included three classes:
-public transit dominant, rideshare dominant, and no dominant mode. The data were divided using a stratified 70/15/15 train, validation, and test split with
-a fixed seed of 1738. Because the outcome classes were imbalanced, macro-F1 was used as the primary validation metric. Adam produced the strongest validation
-performance with a macro-F1 of **0.4270** and validation accuracy of **0.6250**. RMSprop and SGD each produced a macro-F1 of **0.2342** and validation accuracy
-of **0.5417**.
+```{python}
+#| label: setup
+#| warning: false
+#| message: false
+
+import random
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+
+from sklearn.metrics import accuracy_score, f1_score
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from tensorflow import keras
+from tensorflow.keras import layers
+```
+
+## Data Preparation
+
+```{python}
+#| label: load-transportation-data
+
+SEED = 1738
+
+random.seed(SEED)
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
 
 
-| Optimizer | Validation Macro-F1 | Validation Accuracy |
-|:----------|--------------------:|--------------------:|
-| Adam      | **0.4270**          | **0.6250**          |
-| RMSprop   | 0.2342              | 0.5417              |
-| SGD       | 0.2342              | 0.5417              |
+def find_project_root(starting_directory):
+    """Find the DAGE repository root using the DAGE.Rproj file."""
+
+    current_directory = Path(starting_directory).resolve()
+
+    for directory in [current_directory, *current_directory.parents]:
+        if (directory / "DAGE.Rproj").exists():
+            return directory
+
+    raise FileNotFoundError(
+        "Could not locate the DAGE repository root."
+    )
 
 
-## What questions or uncertainties remain?
+PROJECT_DIR = find_project_root(Path.cwd())
 
-The optimizer comparison was based on one data split and one set of learning-rate settings. Additional testing is needed to determine whether Adam remains the
-strongest optimizer across different splits, tuned learning rates, and class-weighting approaches. Would Adam remain the strongest optimizer if learning rates
-were separately tuned for Adam, RMSprop, and SGD?
+DATA_PATH = (
+    PROJECT_DIR
+    / "data_clean"
+    / "survey_transportation.csv"
+)
 
+if not DATA_PATH.exists():
+    raise FileNotFoundError(
+        f"Transportation data were not found at: {DATA_PATH}"
+    )
+
+transport = pd.read_csv(DATA_PATH)
+
+transport = transport[
+    [
+        "q_transport_pref_text",
+        "highest_transport",
+    ]
+].copy()
+
+transport["highest_transport"] = (
+    transport["highest_transport"]
+    .fillna("no_dominant_mode")
+)
+
+transport["q_transport_pref_text"] = (
+    transport["q_transport_pref_text"]
+    .fillna("")
+    .astype(str)
+)
+```
+
+The outcome contains three categories: public-transit dominant, rideshare dominant, and no dominant mode. Cases without a unique dominant transportation mode were coded as `no_dominant_mode`.
+
+```{python}
+#| label: partition-transportation-data
+
+train_df, temporary_df = train_test_split(
+    transport,
+    test_size=0.30,
+    stratify=transport["highest_transport"],
+    random_state=SEED,
+)
+
+validation_df, test_df = train_test_split(
+    temporary_df,
+    test_size=0.50,
+    stratify=temporary_df["highest_transport"],
+    random_state=SEED,
+)
+
+X_train = (
+    train_df["q_transport_pref_text"]
+    .astype(str)
+    .to_numpy()
+)
+
+X_validation = (
+    validation_df["q_transport_pref_text"]
+    .astype(str)
+    .to_numpy()
+)
+
+X_test = (
+    test_df["q_transport_pref_text"]
+    .astype(str)
+    .to_numpy()
+)
+
+y_train_text = train_df["highest_transport"]
+y_validation_text = validation_df["highest_transport"]
+y_test_text = test_df["highest_transport"]
+
+label_encoder = LabelEncoder()
+
+y_train = label_encoder.fit_transform(y_train_text)
+y_validation = label_encoder.transform(y_validation_text)
+y_test = label_encoder.transform(y_test_text)
+```
+
+The observations were divided using a stratified 70/15/15 training, validation, and test split. Stratification preserved the relative frequency of each outcome category across the three partitions.
+
+## Neural-Network Model
+
+```{python}
+#| label: define-neural-network
+
+MAX_TOKENS = 5000
+SEQUENCE_LENGTH = 100
+
+vectorizer = layers.TextVectorization(
+    max_tokens=MAX_TOKENS,
+    output_mode="int",
+    output_sequence_length=SEQUENCE_LENGTH,
+)
+
+# The vocabulary is learned using only the training observations.
+vectorizer.adapt(X_train)
+
+
+def build_model(optimizer):
+    """Build and compile the transportation classification model."""
+
+    model = keras.Sequential(
+        [
+            layers.Input(
+                shape=(1,),
+                dtype=tf.string,
+            ),
+
+            vectorizer,
+
+            layers.Embedding(
+                input_dim=MAX_TOKENS,
+                output_dim=64,
+            ),
+
+            layers.GlobalAveragePooling1D(),
+
+            layers.Dense(
+                64,
+                activation="relu",
+            ),
+
+            layers.Dropout(0.20),
+
+            layers.Dense(
+                3,
+                activation="softmax",
+            ),
+        ]
+    )
+
+    model.compile(
+        optimizer=optimizer,
+        loss="sparse_categorical_crossentropy",
+        metrics=["accuracy"],
+    )
+
+    return model
+```
+
+## Optimizer Comparison
+
+```{python}
+#| label: compare-optimizers
+
+optimizer_functions = {
+    "Adam": lambda: keras.optimizers.Adam(
+        learning_rate=0.001
+    ),
+    "RMSprop": lambda: keras.optimizers.RMSprop(
+        learning_rate=0.001
+    ),
+    "SGD": lambda: keras.optimizers.SGD(
+        learning_rate=0.01
+    ),
+}
+
+optimizer_results = []
+trained_models = {}
+
+for optimizer_name, create_optimizer in optimizer_functions.items():
+
+    keras.backend.clear_session()
+
+    random.seed(SEED)
+    np.random.seed(SEED)
+    tf.random.set_seed(SEED)
+
+    model = build_model(
+        optimizer=create_optimizer()
+    )
+
+    early_stopping = keras.callbacks.EarlyStopping(
+        monitor="val_loss",
+        patience=5,
+        restore_best_weights=True,
+    )
+
+    history = model.fit(
+        X_train,
+        y_train,
+        validation_data=(
+            X_validation,
+            y_validation,
+        ),
+        epochs=50,
+        batch_size=16,
+        callbacks=[early_stopping],
+        verbose=0,
+    )
+
+    validation_probabilities = model.predict(
+        X_validation,
+        verbose=0,
+    )
+
+    validation_predictions = np.argmax(
+        validation_probabilities,
+        axis=1,
+    )
+
+    validation_accuracy = accuracy_score(
+        y_validation,
+        validation_predictions,
+    )
+
+    validation_macro_f1 = f1_score(
+        y_validation,
+        validation_predictions,
+        average="macro",
+        zero_division=0,
+    )
+
+    optimizer_results.append(
+        {
+            "Optimizer": optimizer_name,
+            "Validation Macro-F1": validation_macro_f1,
+            "Validation Accuracy": validation_accuracy,
+            "Epochs Trained": len(
+                history.history["loss"]
+            ),
+        }
+    )
+
+    trained_models[optimizer_name] = model
+
+
+results_df = (
+    pd.DataFrame(optimizer_results)
+    .sort_values(
+        by="Validation Macro-F1",
+        ascending=False,
+    )
+    .reset_index(drop=True)
+)
+
+best_result = results_df.iloc[0]
+best_optimizer_name = best_result["Optimizer"]
+```
+
+## Answer, Response, and Summary of Results
+
+The **`{python} best_optimizer_name` optimizer** produced the highest validation macro-F1 score for this neural-network architecture and data split, as shown in @tbl-optimizer-comparison.
+
+The comparison held the neural-network architecture constant while changing the optimizer. Because the three outcome categories were imbalanced, macro-F1 was used as the primary model-selection metric. The `{python} best_optimizer_name` model produced a validation macro-F1 of **`{python} f'{best_result["Validation Macro-F1"]:.4f}'`** and validation accuracy of **`{python} f'{best_result["Validation Accuracy"]:.4f}'`**.
+
+```{python}
+#| label: tbl-optimizer-comparison
+#| tbl-cap: "Results of optimizer comparisons."
+
+display_results = results_df.copy()
+
+display_results["Validation Macro-F1"] = (
+    display_results["Validation Macro-F1"]
+    .map(lambda value: f"{value:.4f}")
+)
+
+display_results["Validation Accuracy"] = (
+    display_results["Validation Accuracy"]
+    .map(lambda value: f"{value:.4f}")
+)
+
+display_results = display_results.set_index("Optimizer")
+
+display_results
+```
+
+## What Questions or Uncertainties Remain?
+
+This comparison used one stratified data split and one learning-rate setting for each optimizer. Therefore, the results do not establish that the selected optimizer would perform best across every possible split or hyperparameter configuration.
+
+Would the `{python} best_optimizer_name` optimizer remain the strongest option if the learning rate for each optimizer were tuned separately or if performance were evaluated across multiple stratified splits?
