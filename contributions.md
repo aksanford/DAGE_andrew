@@ -91,14 +91,11 @@ The last bullet in each section asks which portion of the data science process y
 
 ## Student 4: [Dasey Dang] (`daseydang`)
 
-- **The component I "owned" and that I summarize here is best described as**
-- **You can find this contribution in a file called** `filename.qmd` **at lines** XX–YY.
-- **Owning this component means**
-- **The commits or PRs that are most relevant are**
-- **The portion of the data science process that this effort contributes to is**
-
----
-
+- **The component I "owned" and that I summarize here is best described as** the neural-network modeling pipeline used to predict transportation-use category from participants’ open-ended transportation responses. I developed the final binary classification workflow, including text vectorization, train-validation-test splitting, model training, class weighting, threshold selection, and evaluation using accuracy, precision, recall, F1, and confusion matrices.
+- **You can find this contribution in files called** `nn_publicvsother.py` and `nn_publicvsrideshare.py` within the `DAGE/scripts/nn_trans` directory.
+- **Owning this component means** I adapted the group’s initial neural-network approach into a working end-to-end modeling script, using `aksanford`’s `proj_bible_example` as a reference. I implemented the text-vectorization and embedding pipeline, created reproducible stratified 70/15/15 data splits, converted the transportation outcome into a binary target, addressed class imbalance through class weights, and evaluated the model on held-out validation and test data. I also debugged local and Colab execution issues involving file paths, TensorFlow environments, Quarto rendering, and model-output handling.
+- **The commits or PRs that are most relevant are** [#23 - Added NN for Public Transportation VS. RS/Other](https://github.com/grantmooslin/DAGE/commit/1479c42fbdb7189509e9cab1f595228cb3c2d6db) where the component was added to the repo.
+- **The portion of the data science process that this effort contributes to is** stage 5, **Select + Apply**, and stage 6, **Check + Recheck**. The work involved selecting and applying a neural-network text-classification approach, then evaluating whether the model generalized to held-out validation and test data using macro/F1, accuracy, class-specific performance, and confusion matrices. It also contributes to reproducibility and implementation through the executable modeling script and the Colab/Devin workflow used to run the complete pipeline.
 
 ---
 
