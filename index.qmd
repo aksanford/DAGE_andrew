@@ -3,7 +3,16 @@ title: "index.qmd"
 author: "DAGE"
 format: html
 editor: visual
+execute:
+  freeze: auto
 ---
+
+```{r}
+#| include: false
+library(reticulate)
+# Use system Python 3.11 where packages are installed
+use_python("/Library/Frameworks/Python.framework/Versions/3.11/bin/python3", required = TRUE)
+```
 
 # Neural Network Classification of Open-Text Survey Responses
 
@@ -78,7 +87,7 @@ After numericizing values from a participants' survey responses, relevant questi
 - If both scores have a value \> 0, but are still equal, a participant is assigned to the 'equal' category (indicated equal usage of both methods)
 - If there was a greater value between estimated rideshare usage and estimated public transit usage, a participant was assigned to the category with higher usage.
 
-{{< embed scripts/eda_dependents.qmd#transportation_grid >}}
+{{< embed scripts/eda/eda_dependents.qmd#transportation_grid >}}
 
 The distribution of Dominant Transportation Methods was grossly imbalanced when considering all possible categories (rideshare, public transit, neither, equal), however the distribution became roughly balanced when collapsing categories down to public transit vs. all other possibilities combined. Our group elected to collapse categories as such in order to enable a binary classification approach using a relatively balanced sample.
 
@@ -158,7 +167,7 @@ survey <- survey |>
 
 After numericizing Likert scale values from a participants PRCA responses, relevant questions were sorted into these two groups, depending on which type of apprehension each question targeted. Each group then had the corresponding numeric Likert scale values averaged to calculate the composite scores for 'average group discussion apprehension' and 'average solo conversation apprehension'. Finally, the Dominant Apprehension Type takes the largest of these two values and codes for the corresponding group, or indicates if both scores are equal.
 
-{{< embed ../../scripts/eda_dependents.qmd#apprehension_grid >}}
+{{< embed scripts/eda/eda_dependents.qmd#apprehension_grid >}}
 
 The distribution of dominant apprehension types (either group discussions or solo conversations) was grossly imbalanced across all possible categories (group discussions, solo conversations, and equal apprehension) but becomes roughly balanced when excluding the equal apprehension group. Our group elected to exclude equal apprehension responses to enable a binary classification approach with a relatively balanced sample.
 
@@ -220,6 +229,125 @@ The behavior of interest for this project is the categorical prediction of unsee
 
 ### Dominant Transportation Methods
 
+The binary neural network predicted whether participants were public-transit dominant or belonged to the combined “other” category. The other category included rideshare-dominant participants, participants with equal estimated rideshare and public-transit use, and participants with no estimated use of either option. The model used a classification threshold selected from the validation data by maximizing public-transit F1. :contentReference[oaicite:0]{index=0}
+
+```{python}
+#| label: load-transportation-model
+#| output: false
+#| warning: false
+
+import runpy
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
+# Run the transportation model and retain its results.
+transport_results = runpy.run_path(
+    "scripts/nn_trans/nn_publicvsother.py"
+)
+
+history = transport_results["history"]
+test_accuracy = transport_results["test_accuracy"]
+test_precision = transport_results["test_precision"]
+test_recall = transport_results["test_recall"]
+test_f1 = transport_results["test_f1"]
+best_threshold = transport_results["best_threshold"]
+test_confusion_df = transport_results["test_confusion_df"]
+```
+
+```{python}
+#| label: fig-transportation-accuracy
+#| fig-cap: "Training and validation accuracy across neural-network training epochs."
+#| warning: false
+
+accuracy_history = pd.DataFrame(
+    {
+        "Epoch": range(
+            1,
+            len(history.history["accuracy"]) + 1,
+        ),
+        "Training accuracy": history.history["accuracy"],
+        "Validation accuracy": history.history["val_accuracy"],
+    }
+)
+
+accuracy_history = accuracy_history.melt(
+    id_vars="Epoch",
+    var_name="Dataset",
+    value_name="Accuracy",
+)
+
+sns.lineplot(
+    data=accuracy_history,
+    x="Epoch",
+    y="Accuracy",
+    hue="Dataset",
+)
+
+plt.ylim(0, 1)
+plt.xlabel("Training epoch")
+plt.ylabel("Accuracy")
+plt.tight_layout()
+plt.show()
+```
+
+As shown in @fig-transportation-accuracy, training and validation accuracy were tracked across epochs to evaluate the model’s learning behavior and determine whether its performance generalized beyond the training data.
+
+```{python}
+#| label: tbl-transportation-performance
+#| tbl-cap: "Final test-set performance for the public-transit versus other neural network."
+
+performance_results = pd.DataFrame(
+    {
+        "Metric": [
+            "Classification threshold",
+            "Accuracy",
+            "Public-transit precision",
+            "Public-transit recall",
+            "Public-transit F1",
+        ],
+        "Value": [
+            best_threshold,
+            test_accuracy,
+            test_precision,
+            test_recall,
+            test_f1,
+        ],
+    }
+)
+
+performance_results["Value"] = (
+    performance_results["Value"]
+    .round(3)
+)
+
+performance_results
+```
+
+As reported in @tbl-transportation-performance, the model achieved an accuracy of `{python} round(test_accuracy, 3)` and a public-transit F1 score of `{python} round(test_f1, 3)` on the held-out test set. Public-transit precision was `{python} round(test_precision, 3)`, while public-transit recall was `{python} round(test_recall, 3)`. Predictions were classified using a validation-selected threshold of `{python} round(best_threshold, 2)`.
+
+```{python}
+#| label: fig-transportation-confusion-matrix
+#| fig-cap: "Confusion matrix for public-transit versus other predictions on the held-out test set."
+#| warning: false
+
+sns.heatmap(
+    test_confusion_df,
+    annot=True,
+    fmt="d",
+    cbar=False,
+)
+
+plt.xlabel("Predicted transportation category")
+plt.ylabel("Actual transportation category")
+plt.tight_layout()
+plt.show()
+```
+
+@fig-transportation-confusion-matrix shows the number of correct and incorrect classifications for each outcome. Cells along the diagonal represent correct predictions, while the off-diagonal cells represent cases that the model misclassified. This provides additional context beyond overall accuracy by showing whether errors were concentrated among public-transit-dominant participants or participants in the combined other category.
+
 ### Dominant Apprehension Types
 
 ## Analysis
+
