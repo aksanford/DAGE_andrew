@@ -59,25 +59,23 @@ The last bullet in each section asks which portion of the data science process y
 
 ## Student 1: [Grant Mooslin] (`grantmooslin`)
 
-- **The component I "owned" and that I summarize here is best described as** *[One or two sentences. Name the thing. "The ingestion layer," "the model comparison and cross-validation," "the figure pipeline." Not "I helped with the analysis."]*
-- **You can find this contribution in a file called** `filename.qmd` **at lines** XX–YY. *[Add a permalink. List more than one file if the component genuinely spans them.]*
-- **Owning this component means** *[What did owning it actually involve — designing it? writing it? debugging it? deciding between alternatives? Use verbs. If someone else contributed to it, say what they did and where they claim it.]*
-- **The commits or PRs that are most relevant are** *[Two to four actual links. Not SHAs typed out as text — links we can click.]*
-- **The portion of the data science process that this effort contributes to is** *[Name the stage. Say why your part of it mattered to the project's findings.]*
+- The component I worked on can be best described as the doing EDA on the words for the given classes in the dataset.
+- You can find this contribution in a file called `eda_words.qmd` at lines 1-50.
+- Owning this component means I created the word frequency analysis and visualizations to understand the most common words associated with each class.
+- The commits or PRs that are most relevant are the commits that created the `eda_words.qmd` file and the commits that added the visualizations.
+- The portion of the data science process that this effort contributes to is stage 3, **Explore + Visualize** — creating visualizations to understand the data and identify patterns.
+- Advised future tests of the models based on the words that were most indicative of each class.
+- tested the model utilizing feature abalation when removing the most common words on "bus" and "walking" which found out that reduced the accuracy of the model down to random chance.
 
 ---
 
-## Student 2: Emily Huffaker (`emilyhuffaker`)
+## Student 2: [Emily Huffaker] (`emilyhuffaker')
 
-- **The component I "owned" and that I summarize here is best described as** the neural-network activation-function comparison. I tested ReLU, tanh, Leaky ReLU, and GELU to determine which hidden-layer activation produced the strongest validation macro-F1 score when predicting dominant transportation mode from participants’ open-ended responses.
-
-- **You can find this contribution in** `scripts/activation_functions_test.py`, where the activation functions are tested while holding the model architecture, Adam optimizer, data split, and training settings constant. The results are summarized in `memos/memos_emily/Emily_memo.pdf`, and the sources used in the memo were added to `references.bib`. [Permalink to activation-function script](https://github.com/emilyhuffaker/DAGE/blob/bf9a2c4f81ef2fba6d16339b107d047a3b3c3cde/scripts/activation_functions_test.py), [permalink to research memo](https://github.com/emilyhuffaker/DAGE/blob/63b878727fa64b2fdbde56dc8744a6693785bed6/memos/memos_emily/Emily_memo.pdf), and [permalink to bibliography]((https://github.com/emilyhuffaker/DAGE/blob/main/references.bib)).
-
-- **Owning this component means** I adapted the group’s neural-network pipeline to compare four hidden-layer activation functions, kept the remaining modeling choices constant for a fair comparison, calculated validation macro-F1 and accuracy, and created a visual summary of the results. I also wrote the research memo and added the supporting sources to the project bibliography.
-
-- **The commits or PRs that are most relevant are** [activation-function analysis commit](https://github.com/emilyhuffaker/DAGE/commit/bf9a2c4f81ef2fba6d16339b107d047a3b3c3cde), [research memo commit](https://github.com/emilyhuffaker/DAGE/commit/63b878727fa64b2fdbde56dc8744a6693785bed6), and [bibliography update commit](https://github.com/emilyhuffaker/DAGE/commit/1dd08fa2c827386abcf0c3a2661d262882cb9bf1).
-
-- **The portions of the data science process that this effort contributes to are** stage 5, **Select + Apply**, and stage 6, **Check + Recheck**. The work primarily involved applying and comparing several neural-network activation functions, then evaluating their performance on held-out validation data using macro-F1 because the outcome classes were imbalanced. It also contributes to **visualization and communication** through the comparison figure, research memo, and supporting references.
+-   **The component I "owned" and that I summarize here is best described as**
+- **You can find this contribution in a file called** `filename.qmd` **at lines** XX–YY.
+- **Owning this component means**
+- **The commits or PRs that are most relevant are**
+- **The portion of the data science process that this effort contributes to is**
 
 ---
 
@@ -93,11 +91,11 @@ The last bullet in each section asks which portion of the data science process y
 
 ## Student 4: [Dasey Dang] (`daseydang`)
 
-- **The component I "owned" and that I summarize here is best described as** the neural network modelling script used to predict dominant transportation mode from open-ended responses.
-- **You can find this contribution in a file called** `nn_model.py` within the `DAGE/scripts/` directory.
-- **Owning this component means** that I adapted and implemented the modelling workflow using `aksanford`’s `proj_bible_example` as a reference.
-- **The commits or PRs that are most relevant are** [insert commit or PR link].
-- **The portion of the data science process that this effort contributes to is** stage 4, **modelling**, and stage 5, **evaluation**.
+- **The component I "owned" and that I summarize here is best described as** the neural-network modeling pipeline used to predict transportation-use category from participants’ open-ended transportation responses. I developed the final binary classification workflow, including text vectorization, train-validation-test splitting, model training, class weighting, threshold selection, and evaluation using accuracy, precision, recall, F1, and confusion matrices.
+- **You can find this contribution in files called** `nn_publicvsother.py` and `nn_publicvsrideshare.py` within the `DAGE/scripts/nn_trans` directory.
+- **Owning this component means** I adapted the group’s initial neural-network approach into a working end-to-end modeling script, using `aksanford`’s `proj_bible_example` as a reference. I implemented the text-vectorization and embedding pipeline, created reproducible stratified 70/15/15 data splits, converted the transportation outcome into a binary target, addressed class imbalance through class weights, and evaluated the model on held-out validation and test data. I also debugged local and Colab execution issues involving file paths, TensorFlow environments, Quarto rendering, and model-output handling.
+- **The commits or PRs that are most relevant are** [#23 - Added NN for Public Transportation VS. RS/Other](https://github.com/grantmooslin/DAGE/commit/1479c42fbdb7189509e9cab1f595228cb3c2d6db) where the component was added to the repo.
+- **The portion of the data science process that this effort contributes to is** stage 5, **Select + Apply**, and stage 6, **Check + Recheck**. The work involved selecting and applying a neural-network text-classification approach, then evaluating whether the model generalized to held-out validation and test data using macro/F1, accuracy, class-specific performance, and confusion matrices. It also contributes to reproducibility and implementation through the executable modeling script and the Colab/Devin workflow used to run the complete pipeline.
 
 ---
 
@@ -105,7 +103,7 @@ The last bullet in each section asks which portion of the data science process y
 
 By adding your name below, each member affirms that the account of their own contribution is accurate, and that they have read the other four sections and believe them to be accurate as well.
 
-- [ ] [Full Name] (`github-username`) — [date]
+- [ ] [Grant Mooslin] (`grantmooslin`) — [date]
 - [ ] [Full Name] (`github-username`) — [date]
 - [ ] [Full Name] (`github-username`) — [date]
 - [ ] [Full Name] (`github-username`) — [date]

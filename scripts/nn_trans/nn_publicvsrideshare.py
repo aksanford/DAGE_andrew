@@ -85,15 +85,17 @@ tf.random.set_seed(SEED)
 
 # File paths
 
-PROJECT_DIR = Path("/content/DAGE")
-DATA_DIR = PROJECT_DIR.parent / "sibling_data"
+PROJECT_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = PROJECT_DIR / "data_clean"
+OUT_DIR = PROJECT_DIR / "output"
+OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # Load transportation dataset
 
 transport = pd.read_csv(DATA_DIR / "survey_transportation.csv")
 
-display(transport.head())
+print(transport.head())
 
 print(transport.columns)
 print(transport.shape)
@@ -324,7 +326,7 @@ print(results_df)
 # Save optimizer comparison outside Git-tracked data folders.
 
 results_df.to_csv(
-    DATA_DIR / "optimizer_results.csv",
+    OUT_DIR / "optimizer_results.csv",
     index=False
 )
 
@@ -393,14 +395,11 @@ plt.ylabel("Optimizer")
 plt.title("Validation Performance by Optimizer")
 
 plt.tight_layout()
-plt.show()
-
-plt.tight_layout()
 
 plt.savefig(
-    "/content/DAGE/memos/optimizer_comparison.png",
+    OUT_DIR / "optimizer_comparison.png",
     dpi=300,
     bbox_inches="tight"
 )
 
-plt.show()
+print(f"Figure saved to {OUT_DIR / 'optimizer_comparison.png'}")
