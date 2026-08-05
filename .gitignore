@@ -1,0 +1,21 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+data_org/*
+data_clean/*
+
+/.quarto/
+**/*.quarto_ipynb
+_quarto.yml
+.venv
+__pycache__/
+.DS_Store
+model_outputs/
+scripts/clean_data.html
+
+# Rendered memo outputs
+memos/memos_grant/*.html
+memos/memos_grant/*.tex
+memos/memos_grant/*_files/
+memos/memos_grant/*.pdf
