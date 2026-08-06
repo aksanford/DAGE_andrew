@@ -19,23 +19,22 @@
 
 ---
 
-## Student 2: [Emily Huffaker] (`emilyhuffaker`)
+## Student 2: Emily Huffaker (`emilyhuffaker`)
 
-- **The component I "owned" and that I summarize here is best described as** the neural-network activation-function comparison and its reproducible research memo. I tested ReLU, tanh, Leaky ReLU, and GELU to determine which hidden-layer activation function produced the highest validation macro-F1 score when predicting dominant transportation mode from participants’ open-ended responses. I also created and maintained the project’s shared `references.bib` bibliography.
+- **The component I "owned" is** the neural-network activation-function analysis and accompanying reproducible research memo. I compared ReLU, tanh, Leaky ReLU, and GELU to determine which hidden-layer activation function produced the highest validation macro-F1 score when predicting dominant transportation mode from participants’ open-ended responses. I also created and maintained the project’s shared `references.bib` file.
 
-- **You can find this contribution in** `scripts/memo_code/activation_functions_test.py`, particularly the model construction and activation-function comparison and the results-saving and visualization code. The accompanying reproducible memo is located in `memos/memos_emily/Emily_memo.qmd`. My bibliography contribution is located in `references.bib`.
+- **You can find this contribution in files called** `activation_functions_test.py`, `Emily_memo.qmd`, and `references.bib`. The activation-function script contains the model training, evaluation, and results-export process. The memo reads the saved results and dynamically generates the comparison figure, performance table, and written results.
 
-  [Permanent link to the activation-function script](https://github.com/grantmooslin/DAGE/blob/be9dc94abf52bc9da98de020edc4435ec3d840b1/scripts/memo_code/activation_functions_test.py)
+- **Owning this component means** I developed the activation-function comparison while holding the neural-network architecture, Adam optimizer, data split, and training settings constant. I implemented reproducible random seeds, early stopping, validation predictions, macro-F1 and accuracy calculations, and code that saves the results to a CSV file. I then integrated those results into the Quarto memo so the reported table, figure, and values are generated from the analysis rather than entered manually. I also compiled the shared BibTeX references used by the project.
 
-  [Permanent link to the research memo](https://github.com/grantmooslin/DAGE/blob/b26448e34af92ef3104305ab39e7d85a9909a3c0/memos/memos_emily/Emily_memo.qmd)
+- **The commits or PRs that are most relevant are** the commits that added and revised `activation_functions_test.py`, created and updated `Emily_memo.qmd`, added the activation-function results CSV, and created and maintained `references.bib`.
 
-  [Permanent link to the original bibliography](https://github.com/grantmooslin/DAGE/blob/21c4c71d45531dfa8d7cea99fa477d865262f029/references.bib)
+- **The portion of the data science process that this effort contributes to is** modeling, evaluation, visualization and communication, and infrastructure and reproducibility. I trained and compared multiple versions of the neural network, evaluated them using validation macro-F1 and accuracy, communicated the results through a dynamically generated figure and table, and connected the analysis script to the Quarto memo through a saved results file.
 
-- **Owning this component means** I adapted the group’s neural-network approach to conduct a controlled comparison of four hidden-layer activation functions while holding the model architecture, Adam optimizer, stratified data split, and training settings constant. I implemented reproducible random seeds, early stopping, validation predictions, macro-F1 and accuracy calculations, and a process for saving the results to a CSV file. I then updated my Quarto memo to load those results directly, dynamically generate the comparison figure and table, and insert the highest-performing activation function and validation scores into the written results. I also assembled the shared BibTeX bibliography used to support the project manuscript and research memos.
-
-- **The commits or PRs that are most relevant are** [the activation-function script refactor and reproducibility update](https://github.com/grantmooslin/DAGE/commit/be9dc94abf52bc9da98de020edc4435ec3d840b1), [the reproducible memo and CSV-results update](https://github.com/grantmooslin/DAGE/commit/b26448e34af92ef3104305ab39e7d85a9909a3c0), [the original research memo contribution](https://github.com/grantmooslin/DAGE/commit/63b878727fa64b2fdbde56dc8744a6693785bed6), [the creation of the shared bibliography](https://github.com/grantmooslin/DAGE/commit/21c4c71d45531dfa8d7cea99fa477d865262f029), and [the subsequent bibliography update](https://github.com/grantmooslin/DAGE/commit/1dd08fa2c827386abcf0c3a2661d262882cb9bf1).
-
-- **The portions of the data science process that this effort contributes to are** stage 5, **Select + Apply**, and stage 6, **Check + Recheck**. The work primarily involved applying and comparing several neural-network activation functions and evaluating their performance on held-out validation data using macro-F1 because the outcome classes were imbalanced. It also contributes to **visualization and communication** through the dynamically generated comparison figure, performance table, research memo, and supporting references. Finally, saving the results to CSV and loading them directly into the Quarto memo contributes to **infrastructure and reproducibility** by ensuring that the reported results are generated from the analysis rather than manually entered.
+- **The commits or PRs that are most relevant are**
+  [Added activation-function comparison]((https://github.com/grantmooslin/DAGE/blob/be9dc94abf52bc9da98de020edc4435ec3d840b1/scripts/memo_code/activation_functions_test.py)),\
+  [Updated the reproducible activation-function memo](https://github.com/grantmooslin/DAGE/blob/b26448e34af92ef3104305ab39e7d85a9909a3c0/memos/memos_emily/Emily_memo.qmd), and\
+  [Created and updated the shared bibliography](https://github.com/grantmooslin/DAGE/blob/21c4c71d45531dfa8d7cea99fa477d865262f029/references.bib).
 
 ---
 
