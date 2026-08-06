@@ -19,22 +19,57 @@ How accurately can semantic features from participants’ descriptions of their 
 
 ## Project Structure + Contents
 
-| Path | What it is |
+| Path | Description |
 |---|---|
-| `index.qmd` | The primary manuscript. Start here. |
-| `contributions.md` | Who owned what. |
-| `memos/` | Individual research memos, one per member. |
-| `references.bib` | Shared BibTeX file for the manuscript and memos. |
-| `data_org/` | Houses original/raw data for the project |
-| `data_clean/` | Houses cleaned or otherwise modified data for the project |
+| `index.qmd` | Primary project manuscript. Start here. |
+| `contributions.md` | Description of each group member's individual contributions. |
+| `memos/` | Individual research memos. |
+| `scripts/` | Data-cleaning, modeling, evaluation, and supporting analysis scripts. |
+| `results/` | Saved model results, tables, figures, and other generated outputs. |
+| `data_org/` | Original or raw project data. |
+| `data_clean/` | Cleaned and processed data used in the analyses. |
+| `references.bib` | Shared BibTeX bibliography for the manuscript and memos. |
+| `requirements.txt` | Python package requirements. |
+| `.env.example` | Example environment-variable file. |
+| `_quarto.yml` | Project-level Quarto configuration. |
+| `DAGE.Rproj` | RStudio project file. |
 
-## Reproducing this project
+
+## Reproducing the Project
+
+### 1. Clone the repository
 
 ```bash
-# from the root of the repo
+git clone https://github.com/grantmooslin/DAGE.git
+cd DAGE
+```
+
+### 2. Install the required Python packages
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+### 3. Confirm that the required data files are available
+
+The analysis expects the necessary files to be available in `data_org/` and `data_clean/`. Some data files may need to be added locally before the manuscript can be rendered.
+
+### 4. Render the primary manuscript
+
+From the root of the repository, run:
+
+```bash
 quarto render index.qmd
+```
+
+To preview the manuscript while editing, run:
+
+```bash
+quarto preview index.qmd
 ```
 
 ## Notes
 
-DAGE is life
+DAGE is life\
+DAGE stands for Data Analysis is Great and Excellent\
+Or Dasey, Andrew, Grant, Emily.
