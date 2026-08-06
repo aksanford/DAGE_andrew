@@ -11,7 +11,6 @@ execute:
   freeze: auto
 ---
 
-
 # Neural Network Classification of Open-Text Survey Responses
 
 # Introduction
@@ -21,14 +20,16 @@ The goal of this project was to determine if neural network models could success
 1.  Predicting 'dominant transportation method' from the open-text responses to question:
 
     |  |
-    |----|
-    | "Describe your ideal way to get around your city, and why you prefer it. To help make your response has richly educational as possible for our students we request you consider your response to offer a thoughtful and meaningful entry." |
+    |------------------------------------------------------------------------|
+    | "Describe your ideal way to get around your city, and why you prefer it. |
+    | To help make your response has richly educational as possible for our students we request you consider your response to offer a thoughtful and meaningful entry." |
 
 2.  Predicting 'dominant apprehension type' from the open-text responses to question:
 
     |  |
-    |----|
-    | "If a friend told you they get nervous talking to new people, what advice would you give them? To help make your response has richly educational as possible for our students we request you consider your response to offer a thoughtful and meaningful entry." |
+    |------------------------------------------------------------------------|
+    | "If a friend told you they get nervous talking to new people, what advice would you give them? |
+    | To help make your response has richly educational as possible for our students we request you consider your response to offer a thoughtful and meaningful entry." |
 
 ## Defining Outcome Variables
 
@@ -167,7 +168,7 @@ After numericizing Likert scale values from a participants PRCA responses, relev
 
 {{< embed scripts/eda/eda_dependents.qmd#apprehension_grid >}}
 
-The distribution of dominant apprehension types (either group discussions or solo conversations) was grossly imbalanced across all possible categories (group discussions, solo conversations, and equal apprehension) but becomes roughly balanced when excluding the equal apprehension group. Our group elected to exclude equal apprehension responses to enable a binary classification approach with a relatively balanced sample.
+The distribution of dominant apprehension types was grossly imbalanced across all possible categories (group discussions, solo conversations, and equal apprehension) but becomes roughly balanced when excluding the equal apprehension group. Our group elected to exclude equal apprehension responses to enable a binary classification approach with a relatively balanced sample.
 
 *NOTE: The engineering of 'Dominant Transportation Method' occurs in the clean_data.qmd script.*
 
@@ -223,12 +224,11 @@ Lastly, the output layer uses this transformed representation to generate the pr
 
 The behavior of interest for this project is the categorical prediction of unseen verses by the fully trained network, with performance being measured in terms of accuracy. Because our classes are slightly imbalanced for each research question, accuracy is a somewhat inflated metric of model performance, however its native support in our Tensorflow/Keras workflow led our group to elect to continue using this metric while acknowledging its limitations.
 
-
 ## Results
 
 ### Dominant Transportation Methods
 
-The binary neural network predicted whether participants were public-transit dominant or belonged to the combined “other” category. The other category included rideshare-dominant participants, participants with equal estimated rideshare and public-transit use, and participants with no estimated use of either option. The model used a classification threshold selected from the validation data by maximizing public-transit F1.
+The binary neural network predicted whether participants were public-transit dominant or belonged to the combined “other” category. The other category included rideshare-dominant participants, participants with equal estimated rideshare and public-transit use, and participants with no estimated use of either option. The model used a classification threshold selected from the validation data by maximizing accuracy.
 
 ```{python}
 #| label: load-transportation-model
@@ -291,7 +291,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-As shown in @fig-transportation-accuracy, training and validation accuracy were tracked across epochs to evaluate the model’s learning behavior and determine whether its performance generalized beyond the training data.
+As shown in @fig-transportation-accuracy, training and validation accuracy were tracked across epochs to evaluate the model’s learning behavior.
 
 ```{python}
 #| label: tbl-transportation-performance
@@ -348,13 +348,232 @@ plt.show()
 
 ### Dominant Apprehension Types
 
+```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+history = pd.read_csv("results/training_history_apprehension.csv")
+```
+
+```{python}
+#| label: "Apprehension Loss Curve"
+
+# Create epoch numbers starting at 1
+epochs = range(1, len(history_df) + 1)
+
+# Plot training and validation loss
+plt.plot(
+    epochs,
+    history_df["training_loss"],
+    label="Training Loss"
+)
+
+plt.plot(
+    epochs,
+    history_df["validation_loss"],
+    label="Validation Loss"
+)
+
+# Add labels and title
+plt.xlabel("Epoch")
+plt.ylabel("Loss")
+plt.title("Training and Validation Loss")
+
+# Display legend and plot
+plt.legend()
+plt.show()
+```
+
+```{python}
+# Create epoch numbers starting at 1
+epochs = range(1, len(history_df) + 1)
+
+# Plot training and validation loss
+plt.plot(
+    epochs,
+    history_df["training_accuracy"],
+    label="Training Accuracy"
+)
+
+plt.plot(
+    epochs,
+    history_df["validation_accuracy"],
+    label="Validation Accuracy"
+)
+
+# Add labels and title
+plt.xlabel("Epoch")
+plt.ylabel("Accuracy")
+plt.title("Training and Validation Accuracy")
+
+# Display legend and plot
+plt.legend()
+plt.show()
+```
+
+While the transportation methods model was able to learn a meaninnful decision boundary with satisfying accuracy, the apprehension types model struggled. Although both models shared similar architecture, inputs, and sample sizes, the apprehension model demonstrated a propensity to immediately overfit to training data in all trainning runs. This model is essentially reverting to a strategy of memorizing training patterns after not being able to find strong relationships between inputs and outputs in the validation set.
+
+```{python}
+import random
+import numpy as np
+import tensorflow as tf
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, classification_report, accuracy_score
+import seaborn as sns
+import torch
+from pathlib import Path
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from tensorflow import keras
+from tensorflow.keras import layers
+le = LabelEncoder()
+
+survey = pd.read_csv("data_clean/survey_apprehension.csv")
+
+# Extract out "Equal"/NA observations
+survey_na = survey[survey['biggest_fear'].isna()].copy()
+
+# Keep only rows where biggest_fear is not NA
+survey = survey[survey['biggest_fear'].notna()].copy()
+
+# Create splits on non-equal observations
+survey_train, survey_temp = train_test_split(
+    survey,
+    test_size=0.30,
+    stratify=survey["biggest_fear"],
+    random_state=SEED
+)
+survey_val, survey_test = train_test_split(
+    survey_temp,
+    test_size=0.50,
+    stratify=survey_temp["biggest_fear"],
+    random_state=SEED
+)
+
+x_train = survey_train["q_advice_text"].astype(str).to_numpy()
+x_val = survey_val["q_advice_text"].astype(str).to_numpy()
+x_test = survey_test["q_advice_text"].astype(str).to_numpy()
+
+
+y_train = le.fit_transform(survey_train["biggest_fear"])
+y_val = le.transform(survey_val["biggest_fear"])
+y_test = le.transform(survey_test["biggest_fear"])
+
+num_classes = len(le.classes_)
+print(f'Classes: {le.classes_}')
+
+# Parameters for vectorization
+max_tokens = 10000
+sequence_length = 100
+
+vectorizer = layers.TextVectorization(
+    max_tokens=max_tokens,
+    output_mode='int',
+    output_sequence_length=sequence_length,
+)
+
+# Adapt vectorizer to training text
+vectorizer.adapt(x_train)
+# Transform inputs to vectors
+x_train = vectorizer(x_train)
+x_val = vectorizer(x_val)
+x_test = vectorizer(x_test)
+
+tf.random.set_seed(SEED)
+
+model = keras.Sequential([
+    # Specify that each input is a sequence of max_length token IDs
+    layers.Input(shape=(max_tokens,)),
+
+    # Embedding layer maps vocabulary tokens to 64-dimensional vectors
+    layers.Embedding(input_dim=max_tokens, output_dim=64),
+
+    # Average embeddings across the sequence length
+    layers.GlobalAveragePooling1D(),
+
+    # Fully connected layers
+    layers.Dense(128, activation='relu'),
+    layers.Dropout(0.2),
+
+    # Output layer
+    layers.Dense(num_classes, activation='sigmoid')
+])
+
+model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+model.load_weights(path_data/"apprehension_model.weights.h5")
+
+# Generate predicted probabilities
+y_pred_probs = model.predict(x_val)
+
+# Convert predicted probabilities to class indices
+y_pred = np.argmax(
+    np.asarray(y_pred_probs, dtype=np.float32),
+    axis=1
+)
+
+# Ensure true labels are integer class indices
+y_true = np.asarray(y_val, dtype=np.int64)
+```
+
+```{python}
+#| label: "Apprehension CM Validation"
+
+# Create confusion matrix
+cm = confusion_matrix(y_true, y_pred)
+
+# Plot
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm,
+    display_labels=le.classes_
+)
+
+disp.plot()
+
+plt.title("Confusion Matrix: Validation Set")
+plt.show()
+```
+
+```{python}
+#| label: "Apprehension CM Test Set"
+
+# Generate predicted probabilities
+y_pred_probs = model.predict(x_test)
+
+# Convert predicted probabilities to class indices
+y_pred = np.argmax(
+    np.asarray(y_pred_probs, dtype=np.float32),
+    axis=1
+)
+
+# Ensure true labels are integer class indices
+y_true = np.asarray(y_test, dtype=np.int64)
+
+# Create confusion matrix
+cm = confusion_matrix(y_true, y_pred)
+
+# Plot
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm,
+    display_labels=le.classes_
+)
+
+disp.plot()
+
+plt.title("Confusion Matrix: Test Set")
+plt.show()
+```
+
+Although the model achieves performance in the validation set of `{python} history_df["validation_accuracy"].max()` that is a slight improvement from a mean-only model, this performance increase vanishes when the test set is evaluated. The apprehension types model ultimately failed to learn a meaningful decision boundary, where the transportation methods model succeeded. The analysis section will investigate the performance of the transportation methods model in an attempt to explain the disparate outcomes across our two research questions.
 
 ## Analysis
 
 ### Ablation test
 
-We did an anlysis of the most common words within all of the classes described by Andrews memo.
-The results are shown in the following table. 
+We did an analysis of the most common words within all of the classes described by Andrew's memo. The results are shown in the following table.
 
 ```{python}
 import re
@@ -438,10 +657,7 @@ for cls in sorted(tr_df["highest_transport"].dropna().unique()):
     )
 ```
 
-As described in this table the words most indicative of the transportation class are the words 
-"bus" and "walking" for the public transportation class.
-
-
+As described in this table the words most indicative of the transportation class are the words "bus" and "walking" for the public transportation class.
 
 ### Model comparison: with vs. without "bus" and "walking"
 
@@ -512,3 +728,7 @@ plt.show()
 ```
 
 ## Discussion + Next Steps
+
+Our results and analysis have determined that of approach of using open-text data to predict survey outcomes is plausible under the right circumstances. When open-text data is derived from a question that is specifically related to the predicted outcome, with responses that can identify uniquely informative keywords and phrases, a neural network is quickly able to learn these relationships. This phenomenon is clearly demonstrated with the transportation methods model, which effectively learned the relevant keywords for dominant transportation methods. When the open-text data does not provide uniquely informative keywords or phrases, such as with the apprehension types model, the model will likely fail to learn a meaningful decision boundary. Not all questions or survey outcomes are appropriate for this method, although build a neural network NLP workflow is an important consideration for extracting additional insight from survey data.
+
+Next steps would primarily include additional strategies to improve performance of the apprehension model. While tokenizing on words did not prove successful despite extensive tuning and architecture adjustments, tokenizing on bigrams, trigrams, or other approaches may allow the model to learn more complicated semantic information contained within the open-text responses.
