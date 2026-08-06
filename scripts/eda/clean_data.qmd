@@ -206,7 +206,7 @@ survey <- survey |>
     biggest_fear = case_when(
       group_apprehension > solo_apprehension ~ "group_apprehension",
       solo_apprehension > group_apprehension ~ "solo_apprehension",
-      .default = "equal")
+      .default = NA)
   )
 ```
 
