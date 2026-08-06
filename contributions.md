@@ -57,7 +57,7 @@ The last bullet in each section asks which portion of the data science process y
 
 ---
 
-## Student 2: [Emily Huffaker] (`emilyhuffaker')
+## Student 2: [Emily Huffaker] (`emilyhuffaker`)
 
 -   **The component I "owned" and that I summarize here is best described as**
 - **You can find this contribution in a file called** `filename.qmd` **at lines** XX–YY.
