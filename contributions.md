@@ -7,12 +7,6 @@
 
 ---
 
-### The data science process
-
-The last bullet in each section asks which portion of the data science process your work contributes to. Name the stage and be specific about your part in it ("data acquisition and ingestion," "cleaning and validation," "exploratory analysis," "modeling," "evaluation," "visualization and communication," "infrastructure and reproducibility.") If your component spans two stages, say so, and say which one it mostly lives in.
-
----
-
 ## Student 1: [Grant Mooslin] (`grantmooslin`)
 
 - The component I worked on can be best described as the doing EDA on the words for the given classes in the dataset.
@@ -29,7 +23,7 @@ The last bullet in each section asks which portion of the data science process y
 
 - **The component I "owned" and that I summarize here is best described as** the neural-network activation-function comparison and its reproducible research memo. I tested ReLU, tanh, Leaky ReLU, and GELU to determine which hidden-layer activation function produced the highest validation macro-F1 score when predicting dominant transportation mode from participants’ open-ended responses. I also created and maintained the project’s shared `references.bib` bibliography.
 
-- **You can find this contribution in** `scripts/memo_code/activation_functions_test.py`, particularly the model construction and activation-function comparison at lines 75–173 and the results-saving and visualization code at lines 175–234. The accompanying reproducible memo is located in `memos/memos_emily/Emily_memo.qmd`, particularly lines 31–135. My bibliography contribution is located in `references.bib`.
+- **You can find this contribution in** `scripts/memo_code/activation_functions_test.py`, particularly the model construction and activation-function comparison and the results-saving and visualization code. The accompanying reproducible memo is located in `memos/memos_emily/Emily_memo.qmd`. My bibliography contribution is located in `references.bib`.
 
   [Permanent link to the activation-function script](https://github.com/grantmooslin/DAGE/blob/be9dc94abf52bc9da98de020edc4435ec3d840b1/scripts/memo_code/activation_functions_test.py)
 
