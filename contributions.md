@@ -7,38 +7,6 @@
 
 ---
 
-## How to use this file
-
-Each member of the group completes one section below. Fill in every bullet. Delete the
-instructions in *italics* as you go, and delete any unused student sections at the bottom
-if your group has fewer than five members.
-
-Three rules:
-
-1. **Components are not co-owned.** No two students may not claim the same component. If you and a partner pair-programmed something, decide who owned it and acknowledge the two person effort. Each person needs their own entry below.
-2. **Everything here must be checkable.** We will follow your file paths and click your links. A claim we cannot verify does not count.
-3. **Link to permanent URLs, not moving ones.** See the note on line numbers below.
-
-> **Reminder — Markdown link syntax.** Write links as `[link text](https://example.com)`. The visible words go in the square brackets and the URL goes in the parentheses, with no space between the two. For example, `[Permalink to load.py](https://github.com/...)` renders as [Permalink to load.py](https://github.com/...). Bare URLs work too, but named links are easier to read.
-
-### A note on line numbers and links
-
-Line numbers go stale the moment someone edits the file above yours. So do links to a branch. Use GitHub **permalinks**, which pin to a specific commit and never move:
-
-> Open the file on GitHub → click the line number (or drag to select a range) → press **`y`** to convert the URL to a permalink → copy.
-
-A permalink looks like this. Note the 40-character commit SHA in the path:
-
-```
-https://github.com/ORG/REPO/blob/a3f2c1e9d4b7.../analysis/model.qmd#L112-L168
-```
-
-Not like this (this one rots):
-
-```
-https://github.com/ORG/REPO/blob/main/analysis/model.qmd#L112-L168
-```
-
 ### The data science process
 
 The last bullet in each section asks which portion of the data science process your work contributes to. Name the stage and be specific about your part in it ("data acquisition and ingestion," "cleaning and validation," "exploratory analysis," "modeling," "evaluation," "visualization and communication," "infrastructure and reproducibility.") If your component spans two stages, say so, and say which one it mostly lives in.
@@ -59,11 +27,21 @@ The last bullet in each section asks which portion of the data science process y
 
 ## Student 2: [Emily Huffaker] (`emilyhuffaker`)
 
--   **The component I "owned" and that I summarize here is best described as**
-- **You can find this contribution in a file called** `filename.qmd` **at lines** XX–YY.
-- **Owning this component means**
-- **The commits or PRs that are most relevant are**
-- **The portion of the data science process that this effort contributes to is**
+- **The component I "owned" and that I summarize here is best described as** the neural-network activation-function comparison and its reproducible research memo. I tested ReLU, tanh, Leaky ReLU, and GELU to determine which hidden-layer activation function produced the highest validation macro-F1 score when predicting dominant transportation mode from participants’ open-ended responses. I also created and maintained the project’s shared `references.bib` bibliography.
+
+- **You can find this contribution in** `scripts/memo_code/activation_functions_test.py`, particularly the model construction and activation-function comparison at lines 75–173 and the results-saving and visualization code at lines 175–234. The accompanying reproducible memo is located in `memos/memos_emily/Emily_memo.qmd`, particularly lines 31–135. My bibliography contribution is located in `references.bib`.
+
+  [Permanent link to the activation-function script](https://github.com/grantmooslin/DAGE/blob/be9dc94abf52bc9da98de020edc4435ec3d840b1/scripts/memo_code/activation_functions_test.py)
+
+  [Permanent link to the research memo](https://github.com/grantmooslin/DAGE/blob/b26448e34af92ef3104305ab39e7d85a9909a3c0/memos/memos_emily/Emily_memo.qmd)
+
+  [Permanent link to the original bibliography](https://github.com/grantmooslin/DAGE/blob/21c4c71d45531dfa8d7cea99fa477d865262f029/references.bib)
+
+- **Owning this component means** I adapted the group’s neural-network approach to conduct a controlled comparison of four hidden-layer activation functions while holding the model architecture, Adam optimizer, stratified data split, and training settings constant. I implemented reproducible random seeds, early stopping, validation predictions, macro-F1 and accuracy calculations, and a process for saving the results to a CSV file. I then updated my Quarto memo to load those results directly, dynamically generate the comparison figure and table, and insert the highest-performing activation function and validation scores into the written results. I also assembled the shared BibTeX bibliography used to support the project manuscript and research memos.
+
+- **The commits or PRs that are most relevant are** [the activation-function script refactor and reproducibility update](https://github.com/grantmooslin/DAGE/commit/be9dc94abf52bc9da98de020edc4435ec3d840b1), [the reproducible memo and CSV-results update](https://github.com/grantmooslin/DAGE/commit/b26448e34af92ef3104305ab39e7d85a9909a3c0), [the original research memo contribution](https://github.com/grantmooslin/DAGE/commit/63b878727fa64b2fdbde56dc8744a6693785bed6), [the creation of the shared bibliography](https://github.com/grantmooslin/DAGE/commit/21c4c71d45531dfa8d7cea99fa477d865262f029), and [the subsequent bibliography update](https://github.com/grantmooslin/DAGE/commit/1dd08fa2c827386abcf0c3a2661d262882cb9bf1).
+
+- **The portions of the data science process that this effort contributes to are** stage 5, **Select + Apply**, and stage 6, **Check + Recheck**. The work primarily involved applying and comparing several neural-network activation functions and evaluating their performance on held-out validation data using macro-F1 because the outcome classes were imbalanced. It also contributes to **visualization and communication** through the dynamically generated comparison figure, performance table, research memo, and supporting references. Finally, saving the results to CSV and loading them directly into the Quarto memo contributes to **infrastructure and reproducibility** by ensuring that the reported results are generated from the analysis rather than manually entered.
 
 ---
 
