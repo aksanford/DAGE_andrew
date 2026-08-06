@@ -58,10 +58,21 @@ Visit [quarto.org](https://quarto.org/docs/get-started/) to install Quarto for y
 
 ### Data Setup
 
-Place the following raw data files in `data_org/`:
+Before running any analysis scripts, place the following raw data files in `data_org/`:
 - `PRCAQualtricsExport_FileC.csv`
 - `PRCAProlificExport_FileA.csv`
 - `PRCAProlificExport_FileB.csv`
+
+The expected location for each file is:
+```
+DAGE/
+└── data_org/
+    ├── PRCAQualtricsExport_FileC.csv
+    ├── PRCAProlificExport_FileA.csv
+    └── PRCAProlificExport_FileB.csv
+```
+
+Download or copy these files from the original data source (e.g., Qualtrics/Prolific exports or the project's shared drive).
 
 **Important:** Do not commit data files to git. The `data_org/` directory should contain only the original raw data files.
 

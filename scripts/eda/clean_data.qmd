@@ -47,6 +47,10 @@ data_prolific <- read_csv(here::here(
 # Join by prolific ID number
 survey <- left_join(data_qualtrics, data_prolific, by = c("Q0" = "Participant id"))
 
+# Save the full joined dataset with original Qualtrics column names for
+# downstream Python EDA and word-frequency analyses.
+survey |> write_csv(here::here(path_clean, "PRCA_FileC_clean.csv"))
+
 # Rename columns
 survey <- survey |> 
   rename(

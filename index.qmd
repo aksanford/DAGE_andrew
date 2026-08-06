@@ -352,7 +352,7 @@ plt.show()
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-history = pd.read_csv("results/training_history_apprehension.csv")
+history_df = pd.read_csv("results/training_history_apprehension.csv")
 ```
 
 ```{python}
@@ -426,6 +426,10 @@ from sklearn.preprocessing import LabelEncoder
 from tensorflow import keras
 from tensorflow.keras import layers
 le = LabelEncoder()
+
+SEED = 8675309
+random.seed(SEED)
+np.random.seed(SEED)
 
 survey = pd.read_csv("data_clean/survey_apprehension.csv")
 
@@ -504,7 +508,7 @@ model.compile(
     metrics=['accuracy']
 )
 
-model.load_weights(path_data/"apprehension_model.weights.h5")
+model.load_weights("results/apprehension_model.weights.h5")
 
 # Generate predicted probabilities
 y_pred_probs = model.predict(x_val)
